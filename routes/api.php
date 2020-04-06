@@ -23,6 +23,17 @@ Route::post('login', 'loginController@login');
 
 Route::group(['middleware' => 'auth:api'], function () {
 
+Route::get('products','ApiController@products');
+Route::post('cart/save', 'CartController@savecartApi')->name('savetocart');
+Route::get('cart/view', 'CartController@viewCartApi');
+Route::get('cart/increment', 'CartController@incrementApi');
+Route::get('cart/decrement', 'CartController@decrementApi');
+Route::get('cart/count', 'CartController@cartCountApi');
+Route::delete('cart/delete', 'CartController@deleteCartItemApi');
+Route::get('total', 'CartController@totalApi');
+Route::post('/pay_with_paypal', 'CartController@checkoutMobile')->name('pay.paypal');
+
+
 
 });
 

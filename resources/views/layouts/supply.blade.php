@@ -79,6 +79,13 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
                     </a>
                    
                 </li>
+                 <li>
+                    <a href="#">
+                        <i class="far fa-envelope"></i>
+                        Orders
+                        
+                    </a>
+                </li>
                 <li>
                     <a href="#">
                         <i class="far fa-envelope"></i>

@@ -37,10 +37,25 @@
                                     <input type="number" name="price" class="form-control" id="exampleFormControlInput1" placeholder="" required=""> 
                                 </div>
                                 <div class="form-group">
+                                    <label for="exampleFormControlInput1">Quantity</label>
+                                    <input type="number" name="qty" class="form-control" id="exampleFormControlInput1" placeholder="" required=""> 
+                                </div>
+                                <br>
+                                 <label for="exampleFormControlInput1">Product Face Image</label>
+                                 <br>
+                                <div class="control-group input-group" style="margin-top:10px">
+                                   
+                                  <input type="file" name="firstImage" id="fileToUpload">
+                                  
+                                </div>
+                                <div class="form-group">
                                     <label for="exampleFormControlTextarea1">Description</label>
                                     <textarea name="description"class="form-control" id="exampleFormControlTextarea1" rows="3" required=""></textarea>
                                 </div>
+                                <br>
+                                <label for="exampleFormControlTextarea1">Complementing image</label><br>
                                 <div class="input-group control-group increment" >
+                                    
                                     <input type="file" name="image[]" class="form-control">
                                     <div class="input-group-btn"> 
                                         <button class="btn btn-success" type="button"><i class="glyphicon glyphicon-plus"></i>Add</button>

@@ -2,14 +2,16 @@
 
 namespace App;
 
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
 use App\product as items;
 use App\shop as shops;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Laravel\Passport\HasApiTokens;
+
 
 class User extends Authenticatable
 {
-    use Notifiable;
+    use  HasApiTokens, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -38,16 +40,23 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    protected $with = ['products','shops'];
+    protected $with = ['products', 'shops','cart','orders'];
 
     public function products()
     {
         return $this->hasMany(items::class);
     }
+    public function cart()
+    {
+        return $this->hasOne('App\cart');
+    }
 
- 
+    public function shops()
+    {
+        return $this->hasMany(shops::class);
+    }
 
-     public function shops(){
-       return  $this->hasMany(shops::class);
-     }
+     public function orders(){
+            return $this->hasMany('App\order');
+    }
 }

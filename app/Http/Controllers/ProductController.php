@@ -27,10 +27,9 @@ class ProductController extends Controller
     public function create()
     {
         $user = auth::user();
-        
+
         $category = cartegory::all();
         $shops = Auth::user()->shops;
- 
 
         return view('supplier.products.create')
             ->with('category', $category)
@@ -49,7 +48,28 @@ class ProductController extends Controller
         $this->validate($request, [
             'image' => 'required',
             'image.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'firstImage' => 'required',
+            'firstImage.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
+
+        //Handle Images Uploads
+        if ($request->hasFile('firstImage')) {
+            //Get filename with extension
+            $filenameWithExt = $request->file('firstImage')->getClientOriginalName();
+            //Get just filename
+            $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
+            //Getting file extension
+            $extension = $request->file('firstImage')->getCLientOriginalExtension();
+            //Stored name
+            $malobolo = $filename . '_' . time() . '_.' . $extension;
+            //Uploading Thumbnail
+
+            //model->
+            $request->file('firstImage')->storeAs('public/product_images', $malobolo);
+        } else {
+            $malobolo = 'noimage.jpg';
+        }
+
         if ($request->hasfile('image')) {
 
             foreach ($request->file('image') as $image) {
@@ -69,15 +89,14 @@ class ProductController extends Controller
             }
         }
 
-        
-       
-        
         $user = auth::user()->id;
         $product = new product;
         $product->name = $request->input('name');
         //save multiple images as json
         $product->imagePath = json_encode($data);
+        $product->firstImage = $malobolo;
         $product->price = $request->input('price');
+        $product->quantity = $request->input('qty');
         $product->description = $request->input('description');
         $product->user_id = $user;
         $product->cartegory_id = $request->input('category_id');
@@ -85,8 +104,7 @@ class ProductController extends Controller
         $product->save();
         return redirect('/supplier/shops')->with('success', 'Product Created Successfully');
 
-       // return redirect('/shops/'+$pra)->with('success', 'Product Created Successfully');
-
+        // return redirect('/shops/'+$pra)->with('success', 'Product Created Successfully');
 
     }
 

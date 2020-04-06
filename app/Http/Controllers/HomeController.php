@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
+use App\Orders;
+use Auth;
 class HomeController extends Controller
 {
     /**
@@ -23,6 +23,9 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('home');
+        $user = auth::user();
+        $orders = auth::user()->orders()->orderBy('created_at', 'desc')->get();
+        return view('home')
+            ->with('orders', $orders);
     }
 }

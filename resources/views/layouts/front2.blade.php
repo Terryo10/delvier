@@ -19,6 +19,7 @@
 	<link rel="stylesheet" type="text/css" href="{{asset('lol/css/colors/colors.css')}}">
 	<link rel="stylesheet" type="text/css" href="{{asset('lol/css/css/bootstrap.css')}}">
 	<link rel="stylesheet" href="{{asset('lol/font-awesome.min.css')}}" />
+	<link href="{{ asset('css/app.css') }}" rel="stylesheet">
 	
 </head>
 <body>
@@ -89,7 +90,7 @@
 			</div>
 		</div>
 	</div>
-	
+	<div>
 	<header class="gradient">
 		<div class="menu-sec">
 			<div class="container">
@@ -143,6 +144,7 @@
 			</div>
 		</div>
 	</header>
+	<div>
 <div>
 	
 	@include('inc.message')
