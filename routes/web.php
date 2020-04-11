@@ -37,7 +37,13 @@ Route::get('cart/ecocash/partial', 'CartController@ecocashPatial')->middleware('
 Route::get('cart/paypal/partial', 'CartController@paypalPartial')->middleware('auth');
 Route::get('cart/delete', 'CartController@deleteCartItem')->middleware('auth');
 Route::get('/pay_with_paypal', 'CartController@checkoutPaypal')->name('pay.paypal')->middleware('auth');
-Route::get('/payment/store', 'CartController@paymentStore')->name('payment.store');
+Route::get('/payment/store', 'CartController@paymentStore')->name('payment.store')->middleware('authx');
+
+//pay with Braintree
+//  Route::get('braintree','CartController@checkoutBraintree')->name('payment.make');
+Route::get('brain','CartController@brr')->middleware('auth');
+
+Route::post('/pay','CartController@checkoutBraintree')->name('pay.braintree')->middleware('auth');
 
 // Admin Routes
 Route::get('admin', 'PagesController@admin');

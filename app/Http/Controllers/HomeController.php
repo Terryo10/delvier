@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Orders;
 use Auth;
+
 class HomeController extends Controller
 {
     /**
@@ -25,7 +26,15 @@ class HomeController extends Controller
     {
         $user = auth::user();
         $orders = auth::user()->orders()->orderBy('created_at', 'desc')->get();
-        return view('home')
-            ->with('orders', $orders);
+
+        if (Auth::user()->role == 0) {
+            return view('home')
+                ->with('orders', $orders);
+        } elseif (Auth::user()->role == 1) {
+           return redirect('/supplier');
+        }elseif (Auth::user()->role == 10) {
+            return redirect('/admin');
+        }
+
     }
 }

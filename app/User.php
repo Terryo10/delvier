@@ -7,6 +7,7 @@ use App\shop as shops;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
+use App\delivery;
 
 
 class User extends Authenticatable
@@ -40,7 +41,7 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    protected $with = ['products', 'shops','cart','orders'];
+    protected $with = ['products', 'shops','cart','orders','delivery'];
 
     public function products()
     {
@@ -58,5 +59,8 @@ class User extends Authenticatable
 
      public function orders(){
             return $this->hasMany('App\order');
+    }
+    public function delivery(){
+        return $this->hasMany('App\delivery');
     }
 }

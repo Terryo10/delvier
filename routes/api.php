@@ -31,7 +31,8 @@ Route::get('cart/decrement', 'CartController@decrementApi');
 Route::get('cart/count', 'CartController@cartCountApi');
 Route::delete('cart/delete', 'CartController@deleteCartItemApi');
 Route::get('total', 'CartController@totalApi');
-Route::post('/pay_with_paypal', 'CartController@checkoutMobile')->name('pay.paypal');
+Route::post('/pay', 'CartController@checkoutMobile')->name('pay.paypal');
+Route::get('client_token','CartController@getToken');
 
 
 

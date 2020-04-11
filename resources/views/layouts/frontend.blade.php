@@ -44,7 +44,7 @@
 		</div>
 		<div class="responsive-opensec">
 			<div class="btn-extars">
-<a href="/cart" title="" class="post-job-btn">Shopping-Cart<i class="la la-shopping-cart">{{Session::has('cart') ? Session::get('cart')->totalQty : ''}}</i></a>
+<a href="/cart" title="" class="post-job-btn">Shopping-Cart<i class="la la-shopping-cart"></i>{{ $quantity ?? 0 }}</a>
 					
 				@guest
 					<ul class="account-btns">
@@ -58,6 +58,7 @@
 				</ul>
 				@endguest
 			</div><!-- Btn Extras -->
+			
 			<form class="res-search">
 				<input type="text" placeholder="Job title, keywords or company name" />
 				<button type="submit"><i class="la la-search"></i></button>
@@ -108,7 +109,7 @@
 					<a href="index-2.html" title=""><img class="hidesticky" src="images/resource/logo.png" alt="" /><img class="showsticky" src="images/resource/logo10.png" alt="" /></a>
 				</div><!-- Logo -->
 				<div class="btn-extars">
-					<a href="/cart" title="" class="post-job-btn">Shopping-Cart<i class="la la-shopping-cart">{{Session::has('cart') ? Session::get('cart')->totalQty : ''}}</i></a>
+					<a href="/cart" title="" class="post-job-btn">Shopping-Cart <i class="la la-shopping-cart"></i>{{ $quantity ?? 0 }}</a>
 					<ul class="account-btns">
 						@guest
 								<li class="signup-popup"><a title=""><i class="la la-key"></i> Sign Up</a></li>
@@ -170,7 +171,8 @@
 			</div>
 		</div>
 	</section>
-    @yield('content')
+	@yield('content')
+	
 </div>
 
 	<footer>
@@ -181,7 +183,7 @@
 						<div class="widget">
 							<div class="about_widget">
 								<div class="logo">
-									<a href="index-2.html" title=""><img src="images/resource/logo.png" alt="" /></a>
+									<a href="/" title=""><img src="images/resource/logo.png" alt="" /></a>
 								</div>
 								<span>Collin Street West, Victor 8007, Australia.</span>
 								<span>+1 246-345-0695</span>

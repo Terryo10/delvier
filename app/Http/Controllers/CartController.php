@@ -8,6 +8,7 @@ use App\order as orders;
 use App\order_items as orderItems;
 use App\product;
 use Auth;
+use Braintree;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 use Srmklive\PayPal\Services\ExpressCheckout;
@@ -464,62 +465,121 @@ class CartController extends Controller
 
     public function checkoutMobile(Request $request)
     {
-        $provider = new ExpressCheckout;
+        $user = Auth::user();
+        $gateway = $this->gateway();
+        $amount = $request->amount;
 
-        // dd($cart);
-        $data = $this->dataMobile();
+        $nonce = $request->payment_method_nonce;
 
-        //give a discount of 10% of the order amount
-        // $data['shipping_discount'] = round((10 / 100) * $total, 2);
-        $response = $provider->setExpressCheckout($data);
-       
-        if ($this->saveOrder($request, $response)) {
-            // This will redirect user to PayPal
-            // issue fixe here
-            // return redirect($response['paypal_link']);
+        $result = $gateway->transaction()->sale([
+            'amount' => $amount,
+            'paymentMethodNonce' => $nonce,
+            'options' => [
+                'submitForSettlement' => true,
+            ],
+        ]);
+        // || !is_null($result->transaction)
+        if ($result->success) {
+            $transaction = $result->transaction;
+            // header("Location: " . $baseUrl . "transaction.php?id=" . $transaction->id);
             return response()->json([
                 'success' => true,
-                'response' => $response,
+                'message' => 'Transaction Successful ',
+            ]);
+        } else {
+            $errorString = "";
+
+            foreach ($result->errors->deepAll() as $error) {
+                $errorString .= 'Error: ' . $error->code . ": " . $error->message . "\n";
+            }
+            return response()->json([
+                'success' => false,
+                'message' => $result->message,
             ]);
 
         }
 
     }
 
-    public function dataMobile()
+    public function getToken()
     {
-        $user = auth::user();
+
+        $auth = auth::user();
+        $gateway = $this->gateway();
+        $token = $gateway->ClientToken()->generate();
+
+        return response()->json([
+            'success' => true,
+            'token' => $token,
+        ]);
+
+    }
+
+    public function checkoutBraintree(Request $request)
+    {
+        $user = Auth::user();
+        $gateway = $this->gateway();
+        $amount = $this->totalweb();
+
+        $nonce = $request->payment_method_nonce;
         if ($user->cart == null) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Your Cart is Empty',
-            ]);
+            return redirect('/cart');
+        }
+        $result = $gateway->transaction()->sale([
+            'amount' => $amount,
+            'paymentMethodNonce' => $nonce,
+            'options' => [
+                'submitForSettlement' => true,
+            ],
+        ]);
+        dd($result);
+        //shippingAmount
+        /// || !is_null($result->transaction)
+        if ($result->success) {
+            $transaction = $result->transaction;
+            
+
+            $cart = $user->cart;
+            // dd($response);
+            $order = new orders();
+            $order->user_id = Auth::id();
+            $order->transaction_ref =  $transaction->id;
+            $order->save();
+            // header("Location: " . $baseUrl . "transaction.php?id=" . $transaction->id);
+            return redirect('/home')->with('success', 'Transaction Successful: The id is' . $transaction->id);
+        } else {
+            $errorString = "";
+
+            foreach ($result->errors->deepAll() as $error) {
+                $errorString .= 'Error: ' . $error->code . ": " . $error->message . "\n";
+            }
+
+            return back()->withErrors('An Error Occurred', $result->message);
 
         }
-        $cart = $user->cart;
-        // dd($cart);
-        $data = [];
-        $data['items'] = [];
-        // dd($cart->items);
-        foreach ($cart->cart_items as $key => $value) {
 
-            $itemDetail = [
-                'name' => $value->product['name'],
-                'price' => $value->product['price'],
-                'qty' => $value->quantity,
+    }
 
-            ];
+    public function brr()
+    {
+        $gateway = $this->gateway();
+        $token = $gateway->ClientToken()->generate();
 
-            $data['items'][] = $itemDetail;
-        }
+        return view('brain')
+            ->with('token', $token);
 
-        $data['invoice_id'] = uniqid();
-        $data['invoice_description'] = "Payment Invoice";
-        $data['return_url'] = route('payment.store');
-        $data['cancel_url'] = route('cart');
-        $data['total'] = $total = $this->totalweb();
+    }
 
-        return $data;
+    public function gateway()
+    {
+        $gateway = new Braintree\Gateway([
+            'environment' => config('services.braintree.environment'),
+            'merchantId' => config('services.braintree.merchant_id'),
+            'publicKey' => config('services.braintree.public_key'),
+            'privateKey' => config('services.braintree.private_key'),
+        ]);
+
+        return $gateway;
 
     }
 }

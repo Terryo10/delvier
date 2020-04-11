@@ -44,7 +44,7 @@
 		</div>
 		<div class="responsive-opensec">
 			<div class="btn-extars">
-<a href="/cart" title="" class="post-job-btn">Shopping-Cart<i class="la la-shopping-cart">{{Session::has('cart') ? Session::get('cart')->totalQty : ''}}</i></a>
+<a href="/cart" title="" class="post-job-btn">Shopping-Cart <i class="la la-shopping-cart"></i>{{ $quantity ?? 0 }}</a>
 					
 				@guest
 					<ul class="account-btns">
@@ -98,7 +98,7 @@
 					<a href="index-2.html" title=""><img class="hidesticky" src="images/resource/logo.png" alt="" /><img class="showsticky" src="images/resource/logo10.png" alt="" /></a>
 				</div><!-- Logo -->
 				<div class="btn-extars">
-					<a href="/cart" title="" class="post-job-btn">Shopping-Cart<i class="la la-shopping-cart">{{Session::has('cart') ? Session::get('cart')->totalQty : ''}}</i></a>
+					<a href="/cart" title="" class="post-job-btn">Shopping-Cart  <i class="la la-shopping-cart"></i>{{ $quantity ?? 0 }}</a>
 					<ul class="account-btns">
 						@guest
 								<li class="signup-popup"><a title=""><i class="la la-key"></i> Sign Up</a></li>
@@ -286,7 +286,7 @@
 		</div>
 	</div>
 </div><!-- SIGNUP POPUP -->
-
+   
 <script data-cfasync="false" src="../../cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="{{asset('lol/js/jquery.min.js')}}" type="text/javascript"></script>
 <script src="{{asset('lol/js/modernizr.js')}}" type="text/javascript"></script>
 <script src="{{asset('lol/js/script.js')}}" type="text/javascript"></script>
