@@ -92,7 +92,7 @@ class ShopController extends Controller
     public function show(shop $shop)
     {
         $orders= order::all();
-        dd($orders);
+       
         $products = $shop->products;
         return view('supplier.shops.show')
             ->with('shop', $shop)

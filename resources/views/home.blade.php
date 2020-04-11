@@ -57,11 +57,11 @@
                          <a class="apply-thisjob" href="/profile" title=""><i class="la la-paper-plane"></i>My Profile</a>
 
                          <div class="apply-alternative">
-				 			<a href="#" title=""><i class="fa fa-linkedin"></i> Apply with Linkedin</a>
+				 			<a href="delivery/create" title=""><i class="fa fa-bus"></i>My Delivery settings</a>
 				 			<span><i class="la la-heart-o"></i> Shortlist</span>
 				 		</div>
 				 		<div class="job-overview">
-				 			<h3>Job Overview</h3>
+				 			<h3>Delvier International</h3>
 				 			<ul>
 				 				<li><i class="la la-money"></i><h3>Offerd Salary</h3><span>£15,000 - £20,000</span></li>
 				 				<li><i class="la la-mars-double"></i><h3>Gender</h3><span>Female</span></li>
@@ -72,11 +72,6 @@
 				 			</ul>
 				 		</div><!-- Job Overview -->
 	
-				 		<div class="extra-job-info">
-				 			<span><i class="la la-clock-o"></i><strong>35</strong> Days</span>
-				 			<span><i class="la la-search-plus"></i><strong>35697</strong> Displayed</span>
-				 			<span><i class="la la-file-text"></i><strong>300-500</strong> Application</span>
-				 		</div>
 				 	</div>
 				</div>
 			</div>

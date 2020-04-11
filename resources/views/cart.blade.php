@@ -80,8 +80,7 @@
 										 @isset($cart_items)
 										 @if($cart_items->count()>0)
 											 <div class="emply-btns">
-								 			<a class="seemap" href="cart/ecocash/partial" title=""><i class="la la-money"></i>CHECKOUT WITH ECOCASH/ ONEMONEY </a>
-								 			<a class="followus" href="cart/paypal/partial" title=""><i class="la la-shopping-cart"></i>CHECKOUT WITH PAYPAL</a>
+								 			<a class="followus" href="/brain" title=""><i class="la la-shopping-cart"></i>CHECKOUT</a>
 								 		</div>
 										 @else
 											 

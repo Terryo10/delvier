@@ -1,15 +1,15 @@
 @extends('layouts.front2')
 @section('content')
-    <div class="container"><h1>Form goes here</h1>
+    <div class="container"><h1>Choose Payment Method</h1>
+        <h4>$total Amount is $ {{$total}} </h4>
     <form method="post" id="payment-form" action="{{route('pay.braintree')}}">
         @csrf
                 <section>
-                    <label for="amount">
-                        <span class="input-label">Amount</span>
-                        <div class="input-wrapper amount-wrapper">
-                            <input id="amount" name="amount" type="tel" min="1" placeholder="Amount" value="10">
+                   
+                        <div >
+                        <input type="hidden" name="amount" type="tel" min="1" placeholder="Amount" value="{{$total}}">
                         </div>
-                    </label>
+                   
 
                     <div class="bt-drop-in-wrapper">
                         <div id="bt-dropin"></div>
@@ -17,7 +17,7 @@
                 </section>
                 <div class="shortlists">
                 <input id="nonce" name="payment_method_nonce" type="hidden" />
-                <button class="button" type="submit"><span>Test Transaction</span></button>
+                <button class="button" type="submit"><span>Do Transaction</span></button>
                 </div>
         </form>
     </div>

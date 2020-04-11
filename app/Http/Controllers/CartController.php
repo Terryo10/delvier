@@ -467,7 +467,7 @@ class CartController extends Controller
     {
         $user = Auth::user();
         $gateway = $this->gateway();
-        $amount = $request->amount;
+        $amount = $this->totalweb();
 
         $nonce = $request->payment_method_nonce;
 
@@ -481,6 +481,16 @@ class CartController extends Controller
         // || !is_null($result->transaction)
         if ($result->success) {
             $transaction = $result->transaction;
+            $cart = $user->cart;
+            // dd($response);
+            $order = new orders();
+            $order->user_id = Auth::id();
+            $order->delivery_id = 1;
+            $order->transaction_ref = $transaction->id;
+            $order->save();
+            $cart = cart::find($user->cart->id);
+            $cart->delete();
+
             // header("Location: " . $baseUrl . "transaction.php?id=" . $transaction->id);
             return response()->json([
                 'success' => true,
@@ -532,19 +542,22 @@ class CartController extends Controller
                 'submitForSettlement' => true,
             ],
         ]);
-        dd($result);
+        // dd($result);
         //shippingAmount
         /// || !is_null($result->transaction)
         if ($result->success) {
             $transaction = $result->transaction;
-            
 
             $cart = $user->cart;
             // dd($response);
             $order = new orders();
             $order->user_id = Auth::id();
-            $order->transaction_ref =  $transaction->id;
+            $order->delivery_id = 1;
+            $order->transaction_ref = $transaction->id;
             $order->save();
+            $cart = cart::find($user->cart->id);
+            $cart->delete();
+
             // header("Location: " . $baseUrl . "transaction.php?id=" . $transaction->id);
             return redirect('/home')->with('success', 'Transaction Successful: The id is' . $transaction->id);
         } else {
@@ -562,11 +575,12 @@ class CartController extends Controller
 
     public function brr()
     {
+        $total = $this->totalweb();
         $gateway = $this->gateway();
         $token = $gateway->ClientToken()->generate();
 
         return view('brain')
-            ->with('token', $token);
+            ->with('token', $token)->with('total', $total);
 
     }
 
