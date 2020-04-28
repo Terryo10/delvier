@@ -21,6 +21,8 @@ class CreateProductsTable extends Migration
             $table->double('price');
             $table->integer('quantity');
             $table->text('description');
+            $table->bigInteger('phone');
+            $table->bigInteger('whatsappPhone');
             $table->integer('display')->default(1);
             $table->integer('adminApproval')->default(1);
             $table->unsignedBigInteger('user_id');

@@ -1,9 +1,8 @@
 @extends('layouts.supply')
 @section('content')
-  <!-- main-heading -->
+<!-- main-heading -->
 <h2 class="main-title-w3layouts mb-2 text-center">Create Product</h2>
             <!--// main-heading -->
-
                 <!-- Forms-2 -->
                         <div class="outer-w3-agile col-xl mt-3">
                             <h4 class="tittle-w3-agileits mb-4">Form Controls</h4>
@@ -70,7 +69,7 @@
                                 </div>
                                 </div>
                                 <div>
-                                             <button type="submit" class="btn btn-primary">Submit to system</button>
+                                <button type="submit" class="btn btn-primary">Submit to system</button>
                                 </div>
                            
 
@@ -80,7 +79,7 @@
                         <!--// Forms-2 -->
 
 
-                        <script type="text/javascript">
+    <script type="text/javascript">
 
     $(document).ready(function() {
 

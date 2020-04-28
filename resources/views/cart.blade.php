@@ -1,52 +1,68 @@
-@extends('layouts.front2')
+@extends('layouts.final')
 @section('content')
+       
+            <nav aria-label="breadcrumb" class="breadcrumb-nav">
+                <div class="container">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="index.html"><i class="icon-home"></i></a></li>
+					<li class="breadcrumb-item active" aria-current="page">{{auth::user()->name}}'s Shopping Cart</li>
+                    </ol>
+                </div><!-- End .container -->
+            </nav>
 
-	<section>
-		<div class="block">
-			<div class="container">
-				<div class="row">
-				 	<div class="col-lg-12 column">
-				 		<div class="job-single-sec style3">
-				 			<div class="job-head-wide">
-				 				<div class="row">
-				 				
-				 				
-				 				</div>
-				 			</div>
-				 			<div class="job-wide-devider">
-							 	<div class="row">
-							 		<div class="col-lg-8 column">		
-							 		
-								 		<div class="recent-jobs">
-							 				<h3>{{auth()->user()->name}}'s Shopping Cart</h3>
-							 				<div class="job-list-modern">
-                                                  @isset($cart_items)
-                                                      @forelse ($cart_items as $items)
-											 	<div class="emply-resume-list">
-                                                    <div class="emply-resume-thumb">
-                                                        <img src="/storage/product_images/{{$items->product['firstImage']}}" alt="" />
-                                                    </div>
-                                                    <div class="emply-resume-info">
-                                                        <h3><a href="#" title="">{{$items->product['name']}}</a></h3>
-                                                        <span><i>Single item Price</i> $ {{$items->product['price']}}.00</span>
-																		
-																<div class="pagination">
-																	<ul>
-																		<li class="prev"><a href="#"><i class="la la-long-arrow-left"></i> Decrement</a></li>
-																		<li><a href="#">Items x {{$items->quantity}}</a></li>
-																		<li class="next"><a href="#">Increment <i class="la la-long-arrow-right"></i></a></li>
-																	</ul>
-																</div>
-													</div>
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="cart-table-container">
+                            <table class="table table-cart">
+                                <thead>
+                                    <tr>
+                                        <th class="product-col">Product</th>
+                                        <th class="price-col">Price</th>
+										<th class="qty-col">Qty</th>
+										<th class="">Action</th>
+                                   
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    
+									  @isset($cart_items)
+										@forelse ($cart_items as $items)
+											<tr class="product-row">
+                                        <td class="product-col">
+                                            <figure class="product-image-container">
+                                                <a href="product.html" class="product-image">
+                                                    <img src="/storage/product_images/{{$items->product['firstImage']}}" alt="product">
+                                                </a>
+                                            </figure>
+                                            <h2 class="product-title">
+                                                <a href="product.html">{{$items->product['name']}}</a>
+                                            </h2>
+                                        </td>
+                                        <td>$ {{$items->product['price']}}</td>
+                                        <td>
+                                            Items x {{$items->quantity}}
+										</td>
+										<td>
+											<form action="/cart/delete" method="get">
+											@csrf
+											<input class="form-control" type="hidden" value="{{$items->id}}" name="cart_item_id">
+											<button class="btn btn-sm btn-primary"  title="Remove product" value="delete " >Remove Product</button>
+											</form>
+										</td>
+									</tr>
+									       <tr class="product-action-row">
+                                        <td colspan="4" class="clearfix">
+                                           
+                                            
+                                            <div class="float-right">
 													
-                                                    <div class="shortlists">
-														<form class="resumeadd-form" action="/cart/delete" method="get">
-															@csrf
-															<input class="form-control" type="hidden" value="{{$items->id}}" name="cart_item_id">
-															<button class="theme-btn reply-btn" value="delete " type="submit">Remove Product</button>
-														</form>
-																	</div>
-                                                </div><!-- Emply List -->
+                                            </div><!-- End .float-right -->
+                                        </td>
+                                    </tr>
+                                </tbody>
+                               
+											 	
                                                 @empty
 													<div class="emply-resume-list">
                                                     <div class="emply-resume-thumb">
@@ -62,40 +78,111 @@
 
                                                  @endforelse
                                                 @endisset 
-											 </div>
-							 			</div>
-							 		</div>
-							 		<div class="col-lg-4 column">
-							 			<!-- Job Overview -->
-								 		<div class="quick-form-job">
-                                             <h3>Select Payment Method</h3>
-                                             
-								 			
-                                         </div>
-                                         <div class="quick-form-job">
-                                             <h3>Total Price:$ {{$total}}.00</h3>
-                                             
-								 			
-										 </div>
-										 @isset($cart_items)
-										 @if($cart_items->count()>0)
-											 <div class="emply-btns">
-								 			<a class="followus" href="/brain" title=""><i class="la la-shopping-cart"></i>CHECKOUT</a>
-								 		</div>
-										 @else
-											 
-										 @endif
-										 @endisset
-								 		
-								 			
-								 		</div>
-							 		</div>
-							 	</div>
-							 </div>
-					 	</div>
-				 	</div>
-				</div>
-			</div>
-		</div>
-	</section>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="4" class="clearfix">
+                                            <div class="float-left">
+                                                <a href="/shop" class="btn btn-outline-secondary">Continue Shopping</a>
+                                            </div><!-- End .float-left -->
+
+                                            <div class="float-right">
+                                                
+                                            </div><!-- End .float-right -->
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                             
+                            </table>
+                        </div><!-- End .cart-table-container -->
+
+                       
+                    </div><!-- End .col-lg-8 -->
+
+                    <div class="col-lg-4">
+                        <div class="cart-summary">
+                            <h3>Summary</h3>
+
+                            <h4>
+                                <a data-toggle="collapse" href="#total-estimate-section" class="collapsed" role="button" aria-expanded="false" aria-controls="total-estimate-section">Estimate Shipping and Tax</a>
+                            </h4>
+
+                            <div class="collapse" id="total-estimate-section">
+                                <form action="#">
+                                    <div class="form-group form-group-sm">
+                                        <label>Country</label>
+                                        <div class="select-custom">
+                                            <select class="form-control form-control-sm">
+                                                <option value="USA">United States</option>
+                                                <option value="Turkey">Turkey</option>
+                                                <option value="China">China</option>
+                                                <option value="Germany">Germany</option>
+                                            </select>
+                                        </div><!-- End .select-custom -->
+                                    </div><!-- End .form-group -->
+
+                                    <div class="form-group form-group-sm">
+                                        <label>State/Province</label>
+                                        <div class="select-custom">
+                                            <select class="form-control form-control-sm">
+                                                <option value="CA">California</option>
+                                                <option value="TX">Texas</option>
+                                            </select>
+                                        </div><!-- End .select-custom -->
+                                    </div><!-- End .form-group -->
+
+                                    <div class="form-group form-group-sm">
+                                        <label>Zip/Postal Code</label>
+                                        <input type="text" class="form-control form-control-sm">
+                                    </div><!-- End .form-group -->
+
+                                    <div class="form-group form-group-custom-control">
+                                        <label>Flat Way</label>
+                                        <div class="custom-control custom-checkbox">
+                                            <input type="checkbox" class="custom-control-input" id="flat-rate">
+                                            <label class="custom-control-label" for="flat-rate">Fixed $5.00</label>
+                                        </div><!-- End .custom-checkbox -->
+                                    </div><!-- End .form-group -->
+
+                                    <div class="form-group form-group-custom-control">
+                                        <label>Best Rate</label>
+                                        <div class="custom-control custom-checkbox">
+                                            <input type="checkbox" class="custom-control-input" id="best-rate">
+                                            <label class="custom-control-label" for="best-rate">Table Rate $15.00</label>
+                                        </div><!-- End .custom-checkbox -->
+                                    </div><!-- End .form-group -->
+                                </form>
+                            </div><!-- End #total-estimate-section -->
+
+                            <table class="table table-totals">
+                                <tbody>
+                                    <tr>
+                                        <td>Subtotal</td>
+                                        <td>${{$total}}.00</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>Tax</td>
+                                        <td>$0.00</td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td>Order Total</td>
+                                        <td>${{$total}}.00</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+
+                            <div class="checkout-methods">
+                                <a href="/brain" class="btn btn-block btn-sm btn-primary">Go to Checkout</a>
+                                <a href="#" class="btn btn-link btn-block">Check Out with Multiple Addresses</a>
+                            </div><!-- End .checkout-methods -->
+                        </div><!-- End .cart-summary -->
+                    </div><!-- End .col-lg-4 -->
+                </div><!-- End .row -->
+            </div><!-- End .container -->
+
+            <div class="mb-6"></div><!-- margin -->
+        
+
 @endsection

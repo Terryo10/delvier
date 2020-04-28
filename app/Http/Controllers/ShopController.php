@@ -18,6 +18,7 @@ class ShopController extends Controller
      */
     public function index()
     {
+        
         $shops = shop::all();
         return view('supplier.shops.index')
             ->with('shops', $shops);
@@ -31,6 +32,7 @@ class ShopController extends Controller
      */
     public function create()
     {
+        $user = auth::user();
         $category = cartegory::all();
         return view('shop.create')
             ->with('category', $category);
@@ -73,6 +75,7 @@ class ShopController extends Controller
         $shop->logo = $fileNameToStore;
         $shop->Address = $request->input('address');
         $shop->phone = $request->input('phone');
+        $shop->whatsappPhone = $request->input('whatsappPhone');
         $shop->description = $request->input('description');
         $shop->user_id = $user;
         $shop->save();

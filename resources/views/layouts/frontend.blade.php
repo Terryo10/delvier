@@ -71,29 +71,27 @@
 						
 						</li>
 						<li class="menu-item">
-							<a href="/home" title="">My Account</a>
+							<a href="/shop" title="">Shop</a>
 							
 						</li>
+					
 						<li class="menu-item">
 							<a href="/categories" title="">Categories</a>
 						</li>
 						@guest
 							@else
 						<li class="menu-item">
+							<a href="/home" title="">My Account</a>
+							
+						</li>
+						<li class="menu-item">
 							<a href="myshop" title="">My Shop</a>
 						</li>
 						@endguest
 						
-						<li class="menu-item-has-children">
+						<li class="menu-item">
 							<a href="#" title="">Job</a>
-							<ul>
-								<li><a href="job_list_classic.html">Job List Classic</a></li>
-								<li><a href="job_list_grid.html">Job List Grid</a></li>
-								<li><a href="job_list_modern.html">Job List Modern</a></li>
-								<li><a href="job_single1.html">Job Single 1</a></li>
-								<li><a href="job_single2.html">Job Single 2</a></li>
-								<li><a href="job-single3.html">Job Single 3</a></li>
-							</ul>
+						
 						</li>
 
 						
@@ -136,6 +134,10 @@
 							<a href="/" title="">Home</a>
 							
 						</li>
+						<li class="menu-item">
+							<a href="/shop" title="">Shop</a>
+							
+						</li>
 						@guest
 							
 						@else
@@ -157,20 +159,6 @@
 	</header>
 <div>
 	
-	<section class="overlape">
-		<div class="block no-padding">
-			<div data-velocity="-.1" style="background: url(lol/images/resource/mslider1.jpg) repeat scroll 50% 422.28px transparent;" class="parallax scrolly-invisible no-parallax"></div><!-- PARALLAX BACKGROUND IMAGE -->
-			<div class="container fluid">
-				<div class="row">
-					<div class="col-lg-12">
-						<div class="inner-header">
-							@include('inc.message')
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</section>
 	@yield('content')
 	
 </div>

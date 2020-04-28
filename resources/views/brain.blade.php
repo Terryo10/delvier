@@ -1,6 +1,6 @@
-@extends('layouts.front2')
+@extends('layouts.final')
 @section('content')
-    <div class="container"><h1>Choose Payment Method</h1>
+    <div id="clogune "class="container"><h1>Choose Payment Method</h1>
         <h4>$total Amount is $ {{$total}} </h4>
     <form method="post" id="payment-form" action="{{route('pay.braintree')}}">
         @csrf

@@ -6,6 +6,7 @@ use App\cartegory;
 use App\product;
 use Auth;
 use Illuminate\Http\Request;
+use App\shop;
 
 class ProductController extends Controller
 {
@@ -87,7 +88,16 @@ class ProductController extends Controller
                 $image->storeAs('public/product_images', $fileNameToStore);
                 $data[] = $fileNameToStore;
             }
+            
+          
         }
+
+        $getshop = shop::find($request->shop_id);
+        //select * from shop where id = id
+        
+        $phone= $getshop->phone;
+        $getWhatsapp = $getshop->whatsappPhone;
+        // $getWhatsapp = $getshop->
 
         $user = auth::user()->id;
         $product = new product;
@@ -101,6 +111,8 @@ class ProductController extends Controller
         $product->user_id = $user;
         $product->cartegory_id = $request->input('category_id');
         $product->shop_id = $request->input('shop_id');
+        $product->whatsappPhone = $getWhatsapp;
+        $product->phone = $phone;
         $product->save();
         return redirect('/supplier/shops')->with('success', 'Product Created Successfully');
 
@@ -116,7 +128,8 @@ class ProductController extends Controller
      */
     public function show(product $product)
     {
-        //
+        return view('product')
+            ->with('product', $product);
     }
 
     /**
@@ -151,5 +164,30 @@ class ProductController extends Controller
     public function destroy(product $product)
     {
         //
+    }
+
+    public function search(Request $request)
+    {
+        $query = $request->input('query');
+        $products = product::where('name', 'like', "%$query%")->get();
+        return view('search-results')->with('products', $products);
+    }
+
+    public function searchMobile(Request $request)
+    {
+        $query = $request->input('query');
+        $products = product::where('name', 'like', "%$query%")->get();
+
+        if ($products->count() == 0) {
+            return response()->json([
+                'success' => false,
+                'results' => 'No search results found',
+            ]);
+        } else {
+            return response()->json([
+                'success' => true,
+                'results' => $products,
+            ]);
+        }
     }
 }

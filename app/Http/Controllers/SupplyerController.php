@@ -15,9 +15,14 @@ class SupplyerController extends Controller
 
     public function shops(){
         $shops = auth::user()->shops;
-      
         return view('supplier.shops.index')
         ->with('shops',$shops);
+    }
+
+    public function shopOrders(){
+        $shops = auth::user()->shops;
+       return view('supplier.orders.index')
+       ->with('shops',$shops);
     }
     
     public function settings(){

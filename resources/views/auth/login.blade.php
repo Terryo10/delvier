@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.final')
 
 @section('content')
 <div class="container">
@@ -62,6 +62,9 @@
                                         {{ __('Forgot Your Password?') }}
                                     </a>
                                 @endif
+                                    <br>
+                                <a href="/register"><p>Dont have an account?</p></a>
+
                             </div>
                         </div>
                     </form>

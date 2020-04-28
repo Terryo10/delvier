@@ -16,11 +16,11 @@ use Illuminate\Support\Facades\Route;
  */
 
 Route::get('/', function () {
-    $products = product::all();
+    $products = product::inRandomOrder()->paginate(10);
     $category = cartegory::all();
     return view('welcome')
-        ->with('products', $products)
-        ->with('category', $category);
+        ->with('products', $products);
+        
 });
 
 Auth::routes();
@@ -28,7 +28,7 @@ Auth::routes();
 Route::get('/home', 'HomeController@index')->name('home');
 
 //General User Routes
-
+Route::get('search', 'productController@search')->name('search');
 Route::get('shops/personal', 'PagesController@personalShops')->middleware('auth');
 Route::get('categories', 'PagesController@categories');
 Route::get('cart', 'CartController@index')->name('cart')->middleware('auth');
@@ -39,6 +39,12 @@ Route::get('cart/delete', 'CartController@deleteCartItem')->middleware('auth');
 Route::get('/pay_with_paypal', 'CartController@checkoutPaypal')->name('pay.paypal')->middleware('auth');
 Route::get('/payment/store', 'CartController@paymentStore')->name('payment.store')->middleware('auth');
 Route::resource('delivery','DeliveryController');
+Route::get('orders', 'OrderController@index');
+Route::get('/contacts', 'contactsController@get');
+Route::get('/conversation/{id}', 'contactsController@getMessagesFor');
+Route::post('/conversation/send', 'contactsController@send');
+Route::get('chat','PagesController@chat');
+
 
 //pay with Braintree
 //  Route::get('braintree','CartController@checkoutBraintree')->name('payment.make');
@@ -50,6 +56,8 @@ Route::post('/pay','CartController@checkoutBraintree')->name('pay.braintree')->m
 Route::get('admin', 'PagesController@admin');
 Route::resource('category', 'CartegoryController');
 Route::get('users', 'AdminController@users');
+Route::get('userview/{id}', 'AdminController@users');
+Route::get('user/{id}', 'AdminController@single');
 Route::get('shop-manager', 'AdminController@shops');
 Route::get('orders/manager', 'AdminController@oders');
 Route::get('admin/payouts', 'AdminController@payouts');
@@ -63,5 +71,5 @@ Route::resource('product', 'ProductController');
 Route::get('/supplier', 'SupplyerController@index');
 Route::get('/supplier/shops', 'SupplyerController@shops');
 Route::get('/supplier/settings', 'SupplyerController@settings');
-//Route::get('/supplier/products', 'SupplyerController@shops');
+Route::get('/supplier/orders', 'SupplyerController@shopOrders');
 Route::get('/supplier/messages', 'SupplyerController@shops');

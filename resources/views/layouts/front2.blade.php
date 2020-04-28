@@ -20,6 +20,7 @@
 	<link rel="stylesheet" type="text/css" href="{{asset('lol/css/css/bootstrap.css')}}">
 	<link rel="stylesheet" href="{{asset('lol/font-awesome.min.css')}}" />
 	<link href="{{ asset('css/app.css') }}" rel="stylesheet">
+	<script src="{{ asset('js/app.js') }}"defer ></script>
 	
 </head>
 <body>
@@ -68,6 +69,10 @@
 							<a href="/" title="">Home</a>
 							
 						
+						</li>
+						<li class="menu-item">
+							<a href="/shop" title="">Shop</a>
+							
 						</li>
 						<li class="menu-item">
 							<a href="/home" title="">My Account</a>
@@ -125,6 +130,13 @@
 							<a href="/" title="">Home</a>
 							
 						</li>
+						<li class="menu-item">
+							<a href="/shop" title="">Shop</a>
+							
+						</li>
+						<li class="menu-item">
+							<a href="/categories" title="">Categories</a>
+						</li>
 						@guest
 							
 						@else
@@ -150,6 +162,8 @@
 	@include('inc.message')
     @yield('content')
 </div>
+<br>
+<br>
 
 	<footer>
 		<div class="block">
@@ -295,6 +309,74 @@
 <script src="{{asset('lol/js/slick.min.js')}}" type="text/javascript"></script>
 <script src="{{asset('lol/js/parallax.js')}}" type="text/javascript"></script>
 <script src="{{asset('lol/js/select-chosen.js')}}" type="text/javascript"></script>
+<script>
+
+
+function increment(id) {
+
+  var jj = document.getElementById('quantity'+id);
+  var jk = parseInt(jj.value) + 1;
+
+  // window.alert(jk)
+  jj.value = jk;
+
+  
+}
+
+function decrement(id) {
+
+  var jj = document.getElementById('quantity'+id);
+
+  if (parseInt(jj.value) > 1) {
+      var jk = parseInt(jj.value) - 1;
+       jj.value = jk;
+  }else{
+       window.alert("Product Quantity cannot be less than 1")
+      jj.value = 1;
+  }
+
+ 
+
+  
+}
+
+// $(document).ready(function(){
+
+//     var quantitiy=0;
+
+//    $('.quantity-right-plus').click(function(e){
+        
+//         // Stop acting like a button
+//         e.preventDefault();
+//         // Get the field name
+//         var quantity = parseInt($('#quantity').val());
+        
+//         // If is not undefined
+            
+//             $('#quantity').val(quantity + 1);
+
+          
+//             // Increment
+        
+//     });
+
+//      $('.quantity-left-minus').click(function(e){
+//         // Stop acting like a button
+//         e.preventDefault();
+//         // Get the field name
+//         var quantity = parseInt($('#quantity').val());
+        
+//         // If is not undefined
+      
+//             // Increment
+//             if(quantity>0){
+//             $('#quantity').val(quantity - 1);
+//             }
+//     });
+    
+// });
+
+</script>
 
 </body>
 </html>

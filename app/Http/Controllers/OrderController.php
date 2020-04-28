@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\order;
+use Auth;
 use Illuminate\Http\Request;
 
 class OrderController extends Controller
@@ -13,8 +14,23 @@ class OrderController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index()
-    {
-        //
+    { 
+        $orders = auth::user()->orders()->orderBy('created_at', 'desc')->get();
+        
+        if ($orders->count() > 0) {
+            return response()->json([
+                'success' => true,
+                'orders' => $orders,
+            ]);
+
+        } else {
+            return response()->json([
+                'success' => true,
+                'message' => 'You Have Ordered Nothing ',
+            ]);
+
+        }
+
     }
 
     /**

@@ -18,7 +18,8 @@ class CreateShopsTable extends Migration
             $table->string('name');
             $table->string('logo');
             $table->string('Address');
-            $table->string('phone');
+            $table->bigInteger('phone')->unique();
+            $table->bigInteger('whatsappPhone')->unique();
             $table->text('description');
             $table->boolean('verified')->nullable()->default(0);
             $table->unsignedBigInteger('user_id');

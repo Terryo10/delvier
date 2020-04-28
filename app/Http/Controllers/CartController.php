@@ -40,6 +40,29 @@ class CartController extends Controller
 
     }
 
+    public function cartCount()
+    {
+        $user = auth::user();
+        $quantity = 0;
+        if ($user->cart !== null) {
+            $cart = cart::find($user->cart->id);
+            // $count = $cart->cart_items->count();
+            foreach ($cart->cart_items as $item) {
+                $quantity += $item->quantity;
+            }
+            return response()->json([
+                'success' => true,
+                'cart_count' => $quantity,
+            ]);
+
+        } else {
+            return response()->json([
+                'success' => true,
+                'cart_count' => $quantity,
+            ]);
+        }
+    }
+
     public function savecartweb(Request $request)
     {
         $user = auth::user();
@@ -260,6 +283,7 @@ class CartController extends Controller
             $order_item->quantity = $item->quantity;
             $order_item->price = $item->product['price'];
             $order_item->product_id = $item->product_id;
+            $order_item->shop_id = $item->product['shop_id'];
             $order_item->order_id = $order->id;
             $order_item->save();
         }
@@ -461,7 +485,7 @@ class CartController extends Controller
         ]);
     }
 
-    // adaptive payments paypal
+    // brainTree Payments
 
     public function checkoutMobile(Request $request)
     {
@@ -482,19 +506,30 @@ class CartController extends Controller
         if ($result->success) {
             $transaction = $result->transaction;
             $cart = $user->cart;
-            // dd($response);
+// dd($response);
             $order = new orders();
             $order->user_id = Auth::id();
             $order->delivery_id = 1;
             $order->transaction_ref = $transaction->id;
+            $order->paymentStatus = $transaction->status;
             $order->save();
+            $orderSaved = orders::where('transaction_ref', $transaction->id)->first();
+            foreach ($cart->cart_items as $item) {
+                $order_item = new orderItems();
+                $order_item->quantity = $item->quantity;
+                $order_item->price = $item->product['price'];
+                $order_item->product_id = $item->product_id;
+                $order_item->shop_id = $item->product['shop_id'];
+                $order_item->order_id = $orderSaved->id;
+                $order_item->save();
+            }
             $cart = cart::find($user->cart->id);
             $cart->delete();
 
             // header("Location: " . $baseUrl . "transaction.php?id=" . $transaction->id);
             return response()->json([
                 'success' => true,
-                'message' => 'Transaction Successful ',
+                'message' => 'Transaction Successful '
             ]);
         } else {
             $errorString = "";
@@ -513,14 +548,14 @@ class CartController extends Controller
 
     public function getToken()
     {
-
-        $auth = auth::user();
+        $amount = $this->totalweb();
         $gateway = $this->gateway();
         $token = $gateway->ClientToken()->generate();
 
         return response()->json([
             'success' => true,
             'token' => $token,
+            'amount' => $amount,
         ]);
 
     }
@@ -530,8 +565,8 @@ class CartController extends Controller
         $user = Auth::user();
         $gateway = $this->gateway();
         $amount = $this->totalweb();
-
         $nonce = $request->payment_method_nonce;
+
         if ($user->cart == null) {
             return redirect('/cart');
         }
@@ -547,14 +582,24 @@ class CartController extends Controller
         /// || !is_null($result->transaction)
         if ($result->success) {
             $transaction = $result->transaction;
-
             $cart = $user->cart;
-            // dd($response);
+            // dd($transaction);
             $order = new orders();
             $order->user_id = Auth::id();
             $order->delivery_id = 1;
             $order->transaction_ref = $transaction->id;
+            $order->paymentStatus = $transaction->status;
             $order->save();
+            $orderSaved = orders::where('transaction_ref', $transaction->id)->first();
+            foreach ($cart->cart_items as $item) {
+                $order_item = new orderItems();
+                $order_item->quantity = $item->quantity;
+                $order_item->price = $item->product['price'];
+                $order_item->product_id = $item->product_id;
+                $order_item->shop_id = $item->product['shop_id'];
+                $order_item->order_id = $orderSaved->id;
+                $order_item->save();
+            }
             $cart = cart::find($user->cart->id);
             $cart->delete();
 

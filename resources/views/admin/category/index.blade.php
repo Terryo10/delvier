@@ -27,11 +27,11 @@
                             <!-- table3 -->
     
                 <div class="outer-w3-agile mt-3">
-                    <h4 class="tittle-w3-agileits mb-4">all Shops</h4>
+                    <h4 class="tittle-w3-agileits mb-4">all Categories</h4>
                     <table class="table table-striped">
                         <thead>
                             <tr>
-                                <th scope="col">Shop Name</th>
+                                <th scope="col">Category Name</th>
                                
                                  <th scope="col">Action</th>
                                  

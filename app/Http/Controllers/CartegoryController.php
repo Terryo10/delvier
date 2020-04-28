@@ -16,9 +16,18 @@ class CartegoryController extends Controller
     {
         $category = cartegory::all();
         return view('admin.category.index')
-        ->with('category', $category);
+            ->with('category', $category);
     }
 
+    public function ApiCategory()
+    {
+        $category = cartegory::all();
+        return response()->json([
+            'success' => true,
+            'category' => $category,
+        ]);
+
+    }
     /**
      * Show the form for creating a new resource.
      *
@@ -37,8 +46,32 @@ class CartegoryController extends Controller
      */
     public function store(Request $request)
     {
+        $this->validate($request, [
+            'name' => 'required',
+            'image' => 'image|nullable|max:1999',
+        ]);
+
+//Handle Images Uploads
+        if ($request->hasFile('image')) {
+            //Get filename with extension
+            $filenameWithExt = $request->file('image')->getClientOriginalName();
+            //Get just filename
+            $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
+            //Getting file extension
+            $extension = $request->file('image')->getCLientOriginalExtension();
+            //Stored name
+            $fileNameToStore = $filename . '_' . time() . '_.' . $extension;
+            //Uploading Thumbnail
+
+            //model->
+            $request->file('image')->storeAs('public/category_images', $fileNameToStore);
+        } else {
+            $fileNameToStore = 'noimage.jpg';
+        }
+
         $category = new cartegory();
         $category->name = $request->input('name');
+        $category->imagePath = $fileNameToStore;
         $category->save();
         return redirect('/category')->with('success', 'Created Successfully');
 

@@ -33,8 +33,8 @@ class RegisterController extends Controller
         // check if email already registered
         $user = User::where('email', $request->email)->first();
         if (!is_null($user)) {
-            $data['message'] = "Sorry! this email is already registered";
-            return response()->json(['success' => false, 'status' => 'failed', 'data' => $data]);
+            // $data['message'] = "Sorry! this email is already registered";
+            return response()->json(['success' => false, 'message' => 'Sorry! this email is already registered']);
         }
 
         // create and return data

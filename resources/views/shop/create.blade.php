@@ -50,6 +50,14 @@
 				 						<div class="pf-field">
 				 							<input name="phone" type="text" placeholder="tel" required="" />
 				 						</div>
+									 </div>
+									 <div class="col-lg-12">
+										 <span class="pf-title">WhatsApp Phone number</span>
+										 <span class="pf-title">Use : 15551234567	</span>
+										 <span>Don't use: +001-(555)1234567</span>
+				 						<div class="pf-field">
+				 							<input name="whatsappPhone" type="text" placeholder="tel" required="" />
+				 						</div>
 				 					</div>
 				 					<div class="col-lg-12">
 				 						<span class="pf-title">Shop Description</span>

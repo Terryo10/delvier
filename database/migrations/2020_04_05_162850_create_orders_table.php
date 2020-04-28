@@ -17,6 +17,7 @@ class CreateOrdersTable extends Migration
             $table->id();
             $table->string('paymentStatus')->default('initiated');
             $table->string('transaction_ref');
+            // $table->double('checkedOutPrice');
             $table->unsignedBigInteger('delivery_id');
             $table->timestamps();
         });
