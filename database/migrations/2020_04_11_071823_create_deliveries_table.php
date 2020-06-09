@@ -17,7 +17,14 @@ class CreateDeliveriesTable extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->string('address');
+            $table->string('company')->nullable();
             $table->string('phone');
+            $table->string('firstname');
+            $table->string('lastname');
+            $table->string('city');
+            $table->string('state');
+            $table->string('transaction_ref');
+            $table->string('country');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
         });

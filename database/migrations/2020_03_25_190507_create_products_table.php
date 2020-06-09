@@ -20,6 +20,7 @@ class CreateProductsTable extends Migration
             $table->string('firstImage');
             $table->double('price');
             $table->integer('quantity');
+            $table->integer('minOrder');
             $table->text('description');
             $table->bigInteger('phone');
             $table->bigInteger('whatsappPhone');

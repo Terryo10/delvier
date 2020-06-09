@@ -24,7 +24,7 @@
                                 </ul>
                             </li>
                         </ul>
-                            <!-- table3 -->
+ <!-- table3 -->
                 <div class="outer-w3-agile mt-3">
                     <h4 class="tittle-w3-agileits mb-4">all Users</h4>
                     <table class="table table-striped">
@@ -32,10 +32,11 @@
                             <tr>
                                 <th scope="col">User Name</th>
                                
-                                 <th scope="col">Action</th>
+                                 <th scope="col">Email</th>
+                                  <th scope="col">Action</th>
                                  <th scope="col">Role</th>
                                  <th scope="col">Action</th>
-                                 <th scope="col">Action</th>
+                                 
                                  
                             </tr>
                         </thead>
@@ -43,6 +44,7 @@
                             @foreach ($users as $items)
                             <tr>
                             <th scope="row">{{$items->name}}</th>
+                            <th scope="row">{{$items->email}}</th>
                             @if ($items->role == 1)
                                 <th scope="row">Supplier</th>
                             @elseif($items->role == 10)
@@ -53,13 +55,7 @@
                             
                             <td><a href="/user/{{$items->id}}"><button  class="btn btn-primary" >Edit User Role</button></a></td>
                             <td><a href="/userview/{{$items->id}}"><button  class="btn btn-success" >View </button></a> </td>
-                            <td>
-                            <form class="delete_form" method="POST" action="{{action('CartegoryController@destroy',$items->id)}}">
-                                    @csrf
-                                    <input type="hidden" name="_method" value="DELETE">
-                                    <button type="submit" class="btn btn-danger" >Block </button>
-                                </form>
-                            </td>
+                           
 
                                 
                             </tr>

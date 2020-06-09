@@ -4,17 +4,24 @@ namespace App\Http\Controllers;
 
 use App\cart;
 use App\cart_items;
+use App\delivery;
+use App\globalCommision;
 use App\order as orders;
 use App\order_items as orderItems;
+use App\pendingorders;
 use App\product;
+use App\shop;
+use App\temporaryAddress;
 use Auth;
 use Braintree;
+use EasyPost\EasyPost;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 use Srmklive\PayPal\Services\ExpressCheckout;
 
 class CartController extends Controller
 {
+
     /**
      * Display a listing of the resource.
      *
@@ -76,7 +83,9 @@ class CartController extends Controller
         }
 
         $product = product::find($request->input('product_id'));
-
+        if ($product->minOrder > $request->input('quantity')) {
+            return redirect()->back()->with('error', 'Your quantity is less than the required minimum order quantity');
+        }
         if ($cart_item = $this->checkProductInCart($product->id, $cart->cart_items)) {
             $cart_item = cart_items::find($cart_item->id);
             $cart_item->quantity = $cart_item->quantity + $request->input('quantity');
@@ -183,7 +192,7 @@ class CartController extends Controller
         } else {
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to delete()',
+                'message' => 'Failed to delete',
             ]);
         }
 
@@ -453,23 +462,45 @@ class CartController extends Controller
     {
         $user = auth::user();
 
-        $cart_items = $user->cart->cart_items;
+        $component = $user->checkoutComponent;
+        if ($component == !null) {
+            $cartItem = cart_items::find($component->cart_item_id);
+            $shippingPrice = $component->rate_price;
+            $productPrice = $cartItem->price * $cartItem->quantity;
+            $totalComponentAmount = ($cartItem->price * $cartItem->quantity) + $component->rate_price;
 
-        if (!$cart_items) {
-            return response()->json([
-                'success' => true,
-                'total' => 0,
-            ]);
-        } else {
-            $total = 0;
-            foreach ($cart_items as $item) {
-                $total = $total + ($item->quantity * $item->price);
+            $cart_items = $user->cart->cart_items;
+
+            if (!$cart_items) {
+                return response()->json([
+                    'success' => true,
+                    'total' => 0,
+                    'shippingPrice' => 0,
+                    'totalComponentAmount' => 0,
+                ]);
+            } else {
+                $total = 0;
+                foreach ($cart_items as $item) {
+                    $total = $total + ($item->quantity * $item->price);
+                }
+                return response()->json([
+                    'success' => true,
+                    'total' => $total,
+                    'productPrice' => $productPrice,
+                    'shippingPrice' => $shippingPrice,
+                    'totalComponentAmount' => $totalComponentAmount,
+                ]);
             }
+        } else {
             return response()->json([
                 'success' => true,
-                'total' => $total,
+                'total' => $this->totalweb(),
+                'productPrice' => 0,
+                'shippingPrice' => 0,
+                'totalComponentAmount' => 0,
             ]);
         }
+
     }
 
     public function removeFromCartApi(Request $request)
@@ -489,82 +520,15 @@ class CartController extends Controller
 
     public function checkoutMobile(Request $request)
     {
+
+        $checkoutComponent = auth::user()->checkoutComponent;
+        $cartItem = cart_items::find($checkoutComponent->cart_item_id);
+        $total = ($cartItem->price * $cartItem->quantity) + $checkoutComponent->rate_price;
+//        return $cartItem;
+        //        $amount = $checkoutComponent->
         $user = Auth::user();
         $gateway = $this->gateway();
-        $amount = $this->totalweb();
-
-        $nonce = $request->payment_method_nonce;
-
-        $result = $gateway->transaction()->sale([
-            'amount' => $amount,
-            'paymentMethodNonce' => $nonce,
-            'options' => [
-                'submitForSettlement' => true,
-            ],
-        ]);
-        // || !is_null($result->transaction)
-        if ($result->success) {
-            $transaction = $result->transaction;
-            $cart = $user->cart;
-// dd($response);
-            $order = new orders();
-            $order->user_id = Auth::id();
-            $order->delivery_id = 1;
-            $order->transaction_ref = $transaction->id;
-            $order->paymentStatus = $transaction->status;
-            $order->save();
-            $orderSaved = orders::where('transaction_ref', $transaction->id)->first();
-            foreach ($cart->cart_items as $item) {
-                $order_item = new orderItems();
-                $order_item->quantity = $item->quantity;
-                $order_item->price = $item->product['price'];
-                $order_item->product_id = $item->product_id;
-                $order_item->shop_id = $item->product['shop_id'];
-                $order_item->order_id = $orderSaved->id;
-                $order_item->save();
-            }
-            $cart = cart::find($user->cart->id);
-            $cart->delete();
-
-            // header("Location: " . $baseUrl . "transaction.php?id=" . $transaction->id);
-            return response()->json([
-                'success' => true,
-                'message' => 'Transaction Successful '
-            ]);
-        } else {
-            $errorString = "";
-
-            foreach ($result->errors->deepAll() as $error) {
-                $errorString .= 'Error: ' . $error->code . ": " . $error->message . "\n";
-            }
-            return response()->json([
-                'success' => false,
-                'message' => $result->message,
-            ]);
-
-        }
-
-    }
-
-    public function getToken()
-    {
-        $amount = $this->totalweb();
-        $gateway = $this->gateway();
-        $token = $gateway->ClientToken()->generate();
-
-        return response()->json([
-            'success' => true,
-            'token' => $token,
-            'amount' => $amount,
-        ]);
-
-    }
-
-    public function checkoutBraintree(Request $request)
-    {
-        $user = Auth::user();
-        $gateway = $this->gateway();
-        $amount = $this->totalweb();
+        $amount = $total;
         $nonce = $request->payment_method_nonce;
 
         if ($user->cart == null) {
@@ -583,28 +547,225 @@ class CartController extends Controller
         if ($result->success) {
             $transaction = $result->transaction;
             $cart = $user->cart;
+            $subcommision = globalCommision::find(1);
+            $commision = $subcommision->percentage;
             // dd($transaction);
+            $temporaryAddress = auth::user()->temporaryAddress;
+            $delivery = new delivery();
+            $delivery->user_id = Auth::id();
+            $delivery->address = $temporaryAddress->address;
+            $delivery->company = $temporaryAddress->company;
+            $delivery->phone = $temporaryAddress->phone;
+            $delivery->firstname = $temporaryAddress->firstname;
+            $delivery->lastname = $temporaryAddress->lastname;
+            $delivery->city = $temporaryAddress->city;
+            $delivery->state = $temporaryAddress->state;
+            $delivery->transaction_ref = $transaction->id;
+            $delivery->country = $temporaryAddress->country;
+            $delivery->save();
+            $fetchdelivery = delivery::where('transaction_ref', $transaction->id)->first();
+            //begin shipment
+
+            $shipping_rate = $checkoutComponent->rate_index;
+
+            $shipment = $this->shipment();
+            $shipment->buy($shipment->rates[$shipping_rate]);
+//            $shipment->buy(array('rate' => array('id' =>$shipping_rate)));
+
+            $tracking = $shipment->tracker;
+
+            //begin orders
             $order = new orders();
             $order->user_id = Auth::id();
-            $order->delivery_id = 1;
+            $order->delivery_id = $fetchdelivery->id;
             $order->transaction_ref = $transaction->id;
             $order->paymentStatus = $transaction->status;
+            $order->commision = $commision;
+            $order->status = 'ordered';
+            $order->tracker_id = $tracking->id;
+            $order->shipment_id = $tracking->shipment_id;
+            $order->trackerUrl = $tracking->public_url;
+            $order->carrier = $tracking->carrier;
             $order->save();
+
             $orderSaved = orders::where('transaction_ref', $transaction->id)->first();
-            foreach ($cart->cart_items as $item) {
-                $order_item = new orderItems();
-                $order_item->quantity = $item->quantity;
-                $order_item->price = $item->product['price'];
-                $order_item->product_id = $item->product_id;
-                $order_item->shop_id = $item->product['shop_id'];
-                $order_item->order_id = $orderSaved->id;
-                $order_item->save();
-            }
-            $cart = cart::find($user->cart->id);
-            $cart->delete();
+            $order_item = new orderItems();
+            $order_item->quantity = $cartItem->quantity;
+            $order_item->status = 'ordered';
+            $order_item->price = $cartItem->product['price'];
+            $order_item->product_id = $cartItem->product_id;
+            $order_item->shop_id = $cartItem->product['shop_id'];
+            $order_item->order_id = $orderSaved->id;
+            $order_item->commision = $commision;
+            $order_item->payout = 'Pending';
+            $order_item->payoutId = 1;
+            $order_item->save();
+
+            // $payout = new payouts();
+            // $payout->status = 'Not yet Paid';
+            // $payout->order_item = $order_item->id;
+            // $payout->save();
+
+            $productOriginalQuantity = $cartItem->product->quantity;
+            //Subtract quantity
+            $product = product::findOrFail($cartItem->product->id);
+            $product->update([
+                'quantity' => $productOriginalQuantity - $cartItem->quantity,
+            ]);
+
+//            $shipment->buy(array('rate' => array('id' => $checkoutComponent->rate_id)));
+
+            $cartItem->delete();
+
+//            $cart = cart::find($user->cart->id);
+            //            $cart->delete();
 
             // header("Location: " . $baseUrl . "transaction.php?id=" . $transaction->id);
-            return redirect('/home')->with('success', 'Transaction Successful: The id is' . $transaction->id);
+            return response()->json([
+                'success' => true,
+                'message' => 'Transaction Successful ',
+            ]);
+        } else {
+            $errorString = "";
+
+            foreach ($result->errors->deepAll() as $error) {
+                $errorString .= 'Error: ' . $error->code . ": " . $error->message . "\n";
+            }
+            return response()->json([
+                'success' => false,
+                'message' => $result->message,
+            ]);
+
+        }
+
+    }
+
+    public function getToken()
+    {
+        $temporaryAddress = auth::user()->temporaryAddress;
+        if ($temporaryAddress == !null) {
+            $total = $this->totalweb();
+            $gateway = $this->gateway();
+            $token = $gateway->ClientToken()->generate();
+
+            return response()->json([
+                'success' => true,
+                'token' => $token,
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'User has no shipping address',
+            ]);
+
+        }
+
+    }
+
+    public function checkoutBraintree(Request $request)
+    {
+        $checkoutComponent = auth::user()->checkoutComponent;
+        $cartItem = cart_items::find($checkoutComponent->cart_item_id);
+        $total = ($cartItem->price * $cartItem->quantity) + $checkoutComponent->rate_price;
+//        return $cartItem;
+        //        $amount = $checkoutComponent->
+        $user = Auth::user();
+        $gateway = $this->gateway();
+        $amount = $total;
+        $nonce = $request->payment_method_nonce;
+
+        if ($user->cart == null) {
+            return redirect('/cart');
+        }
+        $result = $gateway->transaction()->sale([
+            'amount' => $amount,
+            'paymentMethodNonce' => $nonce,
+            'options' => [
+                'submitForSettlement' => true,
+            ],
+        ]);
+        // dd($result);
+        //shippingAmount
+        /// || !is_null($result->transaction)
+        if ($result->success) {
+            $transaction = $result->transaction;
+            $cart = $user->cart;
+            $subcommision = globalCommision::find(1);
+            $commision = $subcommision->percentage;
+            // dd($transaction);
+            $temporaryAddress = auth::user()->temporaryAddress;
+            $delivery = new delivery();
+            $delivery->user_id = Auth::id();
+            $delivery->address = $temporaryAddress->address;
+            $delivery->company = $temporaryAddress->company;
+            $delivery->phone = $temporaryAddress->phone;
+            $delivery->firstname = $temporaryAddress->firstname;
+            $delivery->lastname = $temporaryAddress->lastname;
+            $delivery->city = $temporaryAddress->city;
+            $delivery->state = $temporaryAddress->state;
+            $delivery->transaction_ref = $transaction->id;
+            $delivery->country = $temporaryAddress->country;
+            $delivery->save();
+            $fetchdelivery = delivery::where('transaction_ref', $transaction->id)->first();
+            //begin shipment
+
+            $shipping_rate = $checkoutComponent->rate_index;
+
+            $shipment = $this->shipment();
+            $shipment->buy($shipment->rates[$shipping_rate]);
+//            $shipment->buy(array('rate' => array('id' =>$shipping_rate)));
+
+            $tracking = $shipment->tracker;
+
+            //begin orders
+            $order = new orders();
+            $order->user_id = Auth::id();
+            $order->delivery_id = $fetchdelivery->id;
+            $order->transaction_ref = $transaction->id;
+            $order->paymentStatus = $transaction->status;
+            $order->commision = $commision;
+            $order->status = 'ordered';
+            $order->tracker_id = $tracking->id;
+            $order->shipment_id = $tracking->shipment_id;
+            $order->trackerUrl = $tracking->public_url;
+            $order->carrier = $tracking->carrier;
+            $order->save();
+
+            $orderSaved = orders::where('transaction_ref', $transaction->id)->first();
+            $order_item = new orderItems();
+            $order_item->quantity = $cartItem->quantity;
+            $order_item->status = 'ordered';
+            $order_item->price = $cartItem->product['price'];
+            $order_item->product_id = $cartItem->product_id;
+            $order_item->shop_id = $cartItem->product['shop_id'];
+            $order_item->order_id = $orderSaved->id;
+            $order_item->commision = $commision;
+            $order_item->payout = 'Pending';
+            $order_item->payoutId = 1;
+            $order_item->save();
+
+            // $payout = new payouts();
+            // $payout->status = 'Not yet Paid';
+            // $payout->order_item = $order_item->id;
+            // $payout->save();
+
+            $productOriginalQuantity = $cartItem->product->quantity;
+            //Subtract quantity
+            $product = product::findOrFail($cartItem->product->id);
+            $product->update([
+                'quantity' => $productOriginalQuantity - $cartItem->quantity,
+            ]);
+
+//            $shipment->buy(array('rate' => array('id' => $checkoutComponent->rate_id)));
+
+            $cartItem->delete();
+
+//            $cart = cart::find($user->cart->id);
+            //            $cart->delete();
+
+            // header("Location: " . $baseUrl . "transaction.php?id=" . $transaction->id);
+            return redirect('/home')->with('success', 'Transaction Successful: The Transaction Reference is' . $transaction->id);
+
         } else {
             $errorString = "";
 
@@ -620,12 +781,31 @@ class CartController extends Controller
 
     public function brr()
     {
-        $total = $this->totalweb();
-        $gateway = $this->gateway();
-        $token = $gateway->ClientToken()->generate();
 
-        return view('brain')
-            ->with('token', $token)->with('total', $total);
+        $temporaryAddress = auth::user()->temporaryAddress;
+        $checkoutComponent = auth::user()->checkoutComponent;
+        if ($checkoutComponent == !null) {
+            if ($temporaryAddress == !null) {
+
+                $cartItem = cart_items::find($checkoutComponent->cart_item_id);
+                $shippingAmount = $checkoutComponent->rate_price;
+                $productPrice = $cartItem->price * $cartItem->quantity;
+                $total = ($cartItem->price * $cartItem->quantity) + $checkoutComponent->rate_price;
+                $gateway = $this->gateway();
+                $token = $gateway->ClientToken()->generate();
+                return view('brain')
+                    ->with('token', $token)
+                    ->with('total', $total)
+                    ->with('cartItem', $cartItem)
+                    ->with('shppingAmount', $shippingAmount)
+                    ->with('productPrice', $productPrice);
+
+            } else {
+                return redirect('/shipping_details')->with('error', 'You dont have a shipping addresss');
+            }
+        } else {
+            return redirect()->back();
+        }
 
     }
 
@@ -641,4 +821,409 @@ class CartController extends Controller
         return $gateway;
 
     }
+
+    public function shipping()
+    {
+        $temporaryAddress = auth::user()->temporaryAddress;
+        return view('shipping')
+            ->with('temporaryAddress', $temporaryAddress);
+    }
+
+    public function shippingStore(Request $request)
+    {
+
+        $id = auth::user()->id;
+        $temporary = new temporaryAddress();
+        $temporary->user_id = $id;
+        $temporary->firstname = $request->input('firstname');
+        $temporary->lastname = $request->input('lastname');
+        $temporary->state = $request->input('state');
+        $temporary->zip = $request->input('zip');
+        $temporary->company = $request->input('company');
+        $temporary->phone = $request->input('phone');
+        $temporary->city = $request->input('city');
+        $temporary->country = $request->input('country');
+        $temporary->address = $request->input('address');
+        $temporary->email = auth::user()->email;
+        $temporary->save();
+
+        return redirect('/shipping_details')->with('success', 'Address Set');
+
+    }
+
+    public function shippingChange($id)
+    {
+        $shipping = temporaryAddress::find($id);
+        $shipping->delete();
+
+        return redirect('/shipping_details')
+            ->with('success', 'Change your address here');
+
+    }
+
+    public function shippingStoreApi(Request $request)
+    {
+        $temporaryAddress = auth::user()->temporaryAddress;
+        if ($temporaryAddress == !null) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User has shipping address',
+            ]);
+        } else {
+            $id = auth::user()->id;
+            $temporary = new temporaryAddress();
+            $temporary->user_id = $id;
+            $temporary->firstname = $request->input('firstname');
+            $temporary->lastname = $request->input('lastname');
+            $temporary->state = $request->input('state');
+            $temporary->zip = $request->input('zip');
+            $temporary->company = $request->input('company');
+            $temporary->phone = $request->input('phone');
+            $temporary->city = $request->input('city');
+            $temporary->country = $request->input('country');
+            $temporary->address = $request->input('address');
+            $temporary->email = auth::user()->email;
+            $temporary->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Succesfully created',
+            ]);
+
+        }
+    }
+
+    public function shippingChangeApi(Request $request)
+    {
+
+        // return response()->json([
+        //     'success' => false,
+        //     'message' => $request->id,
+        // ]);
+
+        $id = $request->id;
+        $temporaryAddress = auth::user()->temporaryAddress;
+        if ($temporaryAddress == !null) {
+            $shipping = temporaryAddress::find($id);
+            $shipping->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'deleted successfully',
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'you have no address',
+            ]);
+
+        }
+
+    }
+
+    public function shippingApi()
+    {
+        $temporaryAddress = auth::user()->temporaryAddress;
+        if ($temporaryAddress == !null) {
+            return response()->json([
+                'success' => true,
+                'address' => $temporaryAddress,
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'you have no address',
+            ]);
+
+        }
+
+    }
+
+    public function shipment()
+    {
+        EasyPost::setApiKey('EZTK4f50a33b85d14b2eaa51f1736b87bda8aSSWKaSu6OTBtFFEyQjtIQ');
+        $user = auth::user()->checkoutComponent;
+        $cartItem = cart_items::find($user->cart_item_id);
+        $weight = $cartItem->product_id;
+        $shop = shop::find($user->shop_id);
+
+        // Grab the shipping address from the User model
+        $toAddress = \EasyPost\Address::create($this->shippingAddress());
+        $product = \EasyPost\Parcel::create($this->productTest($weight));
+        $fromAddress = \EasyPost\Address::create($this->fromAddress($shop));
+
+        // Pass the PURCHASE flag.
+        // Get the shipment object
+        // EasyPost::setApiKey('EZTK4f50a33b85d14b2eaa51f1736b87bda8aSSWKaSu6OTBtFFEyQjtIQ');
+        $shipment = \EasyPost\Shipment::create(array(
+            'from_address' => $fromAddress,
+            'to_address' => $toAddress,
+            'parcel' => $product,
+
+        ));
+
+        return $shipment;
+    }
+
+
+    public function brr2(Request $request)
+    {
+
+        $temporaryAddress = auth::user()->temporaryAddress;
+        $pending = pendingorders::findorfail($request['pending_id']);
+
+        if ($pending == !null) {
+            if ($temporaryAddress == !null) {
+
+                $cartItem = cart_items::find($pending->cart_item_id);
+                $shippingAmount =$pending->shipping_price;
+                $productPrice = $cartItem->price * $cartItem->quantity;
+                $total = ($cartItem->price * $cartItem->quantity) + $pending->shipping_price;
+                $gateway = $this->gateway();
+                $token = $gateway->ClientToken()->generate();
+                return view('brain2')
+                    ->with('token', $token)
+                    ->with('total', $total)
+                    ->with('cartItem', $cartItem)
+                    ->with('shppingAmount', $shippingAmount)
+                    ->with('productPrice', $productPrice)
+                    ->with('pending',$pending);
+
+            } else {
+                return redirect('/shipping_details')->with('error', 'You dont have a shipping addresss');
+            }
+        } else {
+            return redirect()->back();
+        }
+
+    }
+    public function checkoutBraintree2(Request $request)
+    {
+
+        $checkoutComponent = auth::user()->checkoutComponent;
+        $pending = pendingorders::find($request['pending_id']);
+        $cartItem = cart_items::find($pending->cart_item_id);
+
+        $total = ($cartItem->price * $cartItem->quantity) + $pending->shipping_price;
+//        return $total;
+        //        $amount = $checkoutComponent->
+        $user = Auth::user();
+        $gateway = $this->gateway();
+        $amount = $total;
+        $nonce = $request->payment_method_nonce;
+
+        if ($user->cart == null) {
+            return redirect('/cart');
+        }
+        $result = $gateway->transaction()->sale([
+            'amount' => $amount,
+            'paymentMethodNonce' => $nonce,
+            'options' => [
+                'submitForSettlement' => true,
+            ],
+        ]);
+        // dd($result);
+        //shippingAmount
+        /// || !is_null($result->transaction)
+        if ($result->success) {
+            $transaction = $result->transaction;
+            $cart = $user->cart;
+            $subcommision = globalCommision::find(1);
+            $commision = $subcommision->percentage;
+            // dd($transaction);
+            $temporaryAddress = auth::user()->temporaryAddress;
+            $delivery = new delivery();
+            $delivery->user_id = Auth::id();
+            $delivery->address = $temporaryAddress->address;
+            $delivery->company = $temporaryAddress->company;
+            $delivery->phone = $temporaryAddress->phone;
+            $delivery->firstname = $temporaryAddress->firstname;
+            $delivery->lastname = $temporaryAddress->lastname;
+            $delivery->city = $temporaryAddress->city;
+            $delivery->state = $temporaryAddress->state;
+            $delivery->transaction_ref = $transaction->id;
+            $delivery->country = $temporaryAddress->country;
+            $delivery->save();
+            $fetchdelivery = delivery::where('transaction_ref', $transaction->id)->first();
+            //begin shipment
+//            $shipment->buy(array('rate' => array('id' =>$shipping_rate)));
+
+            //begin orders
+            $order = new orders();
+            $order->user_id = Auth::id();
+            $order->delivery_id = $fetchdelivery->id;
+            $order->transaction_ref = $transaction->id;
+            $order->paymentStatus = $transaction->status;
+            $order->commision = $commision;
+            $order->status = 'ordered';
+            $order->tracker_id = 'null';
+            $order->shipment_id = 'null';
+            $order->trackerUrl = 'null';
+            $order->carrier = 'null';
+            $order->save();
+
+            $orderSaved = orders::where('transaction_ref', $transaction->id)->first();
+            $order_item = new orderItems();
+            $order_item->quantity = $cartItem->quantity;
+            $order_item->status = 'ordered';
+            $order_item->price = $cartItem->product['price'];
+            $order_item->product_id = $cartItem->product_id;
+            $order_item->shop_id = $cartItem->product['shop_id'];
+            $order_item->order_id = $orderSaved->id;
+            $order_item->commision = $commision;
+            $order_item->payout = 'Pending';
+            $order_item->payoutId = 1;
+            $order_item->save();
+
+            // $payout = new payouts();
+            // $payout->status = 'Not yet Paid';
+            // $payout->order_item = $order_item->id;
+            // $payout->save();
+
+            $productOriginalQuantity = $cartItem->product->quantity;
+            //Subtract quantity
+            $product = product::findOrFail($cartItem->product->id);
+            $product->update([
+                'quantity' => $productOriginalQuantity - $cartItem->quantity,
+            ]);
+
+//            $shipment->buy(array('rate' => array('id' => $checkoutComponent->rate_id)));
+
+            $cartItem->delete();
+
+//            $cart = cart::find($user->cart->id);
+            //            $cart->delete();
+
+            // header("Location: " . $baseUrl . "transaction.php?id=" . $transaction->id);
+            return redirect('/home')->with('success', 'Transaction Successful: The Transaction Reference is' . $transaction->id);
+
+        } else {
+            $errorString = "";
+
+            foreach ($result->errors->deepAll() as $error) {
+                $errorString .= 'Error: ' . $error->code . ": " . $error->message . "\n";
+            }
+
+            return back()->withErrors('An Error Occurred', $result->message);
+
+        }
+
+    }
+
+    public function checkoutMobile2(Request $request)
+    {
+
+//        $checkoutComponent = auth::user()->checkoutComponent;
+        $pending = pendingorders::find($request['pending_id']);
+        $cartItem = cart_items::find($pending->cart_item_id);
+        $total =($cartItem->price * $cartItem->quantity) + $pending->shipping_price;;
+//        return $cartItem;
+        //        $amount = $checkoutComponent->
+        $user = Auth::user();
+        $gateway = $this->gateway();
+        $amount = $total;
+        $nonce = $request->payment_method_nonce;
+
+        if ($user->cart == null) {
+            return redirect('/cart');
+        }
+        $result = $gateway->transaction()->sale([
+            'amount' => $amount,
+            'paymentMethodNonce' => $nonce,
+            'options' => [
+                'submitForSettlement' => true,
+            ],
+        ]);
+        // dd($result);
+        //shippingAmount
+        /// || !is_null($result->transaction)
+        if ($result->success) {
+            $transaction = $result->transaction;
+            $cart = $user->cart;
+            $subcommision = globalCommision::find(1);
+            $commision = $subcommision->percentage;
+            // dd($transaction);
+            $temporaryAddress = auth::user()->temporaryAddress;
+            $delivery = new delivery();
+            $delivery->user_id = Auth::id();
+            $delivery->address = $temporaryAddress->address;
+            $delivery->company = $temporaryAddress->company;
+            $delivery->phone = $temporaryAddress->phone;
+            $delivery->firstname = $temporaryAddress->firstname;
+            $delivery->lastname = $temporaryAddress->lastname;
+            $delivery->city = $temporaryAddress->city;
+            $delivery->state = $temporaryAddress->state;
+            $delivery->transaction_ref = $transaction->id;
+            $delivery->country = $temporaryAddress->country;
+            $delivery->save();
+            $fetchdelivery = delivery::where('transaction_ref', $transaction->id)->first();
+
+
+
+            //begin orders
+            $order = new orders();
+            $order->user_id = Auth::id();
+            $order->delivery_id = $fetchdelivery->id;
+            $order->transaction_ref = $transaction->id;
+            $order->paymentStatus = $transaction->status;
+            $order->commision = $commision;
+            $order->status = 'ordered';
+            $order->tracker_id = 'null';
+            $order->shipment_id = 'null';
+            $order->trackerUrl = 'null';
+            $order->carrier = 'null';
+            $order->save();
+
+            $orderSaved = orders::where('transaction_ref', $transaction->id)->first();
+            $order_item = new orderItems();
+            $order_item->quantity = $cartItem->quantity;
+            $order_item->status = 'ordered';
+            $order_item->price = $cartItem->product['price'];
+            $order_item->product_id = $cartItem->product_id;
+            $order_item->shop_id = $cartItem->product['shop_id'];
+            $order_item->order_id = $orderSaved->id;
+            $order_item->commision = $commision;
+            $order_item->payout = 'Pending';
+            $order_item->payoutId = 1;
+            $order_item->save();
+
+            // $payout = new payouts();
+            // $payout->status = 'Not yet Paid';
+            // $payout->order_item = $order_item->id;
+            // $payout->save();
+
+            $productOriginalQuantity = $cartItem->product->quantity;
+            //Subtract quantity
+            $product = product::findOrFail($cartItem->product->id);
+            $product->update([
+                'quantity' => $productOriginalQuantity - $cartItem->quantity,
+            ]);
+
+//            $shipment->buy(array('rate' => array('id' => $checkoutComponent->rate_id)));
+
+            $cartItem->delete();
+
+//            $cart = cart::find($user->cart->id);
+            //            $cart->delete();
+
+            // header("Location: " . $baseUrl . "transaction.php?id=" . $transaction->id);
+            return response()->json([
+                'success' => true,
+                'message' => 'Transaction Successful ',
+            ]);
+        } else {
+            $errorString = "";
+
+            foreach ($result->errors->deepAll() as $error) {
+                $errorString .= 'Error: ' . $error->code . ": " . $error->message . "\n";
+            }
+            return response()->json([
+                'success' => false,
+                'message' => $result->message,
+            ]);
+
+        }
+
+    }
+
 }

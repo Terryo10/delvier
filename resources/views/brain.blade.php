@@ -1,15 +1,27 @@
 @extends('layouts.final')
 @section('content')
+<div class="container">
+  <ul class="checkout-progress-bar">
+          <li>
+            <span>Shipping</span>
+              </li>
+              <li class="active">
+              <span>Make Payments</span>
+          </li>
+    </ul>
+</div>
     <div id="clogune "class="container"><h1>Choose Payment Method</h1>
-        <h4>$total Amount is $ {{$total}} </h4>
+        <h4>Product Price is $ {{$productPrice}} </h4>
+        <h4>shipping Amount is $ {{$shppingAmount}} </h4>
+        <h4>total Amount is $ {{$total}} </h4>
     <form method="post" id="payment-form" action="{{route('pay.braintree')}}">
         @csrf
                 <section>
-                   
+
                         <div >
                         <input type="hidden" name="amount" type="tel" min="1" placeholder="Amount" value="{{$total}}">
                         </div>
-                   
+
 
                     <div class="bt-drop-in-wrapper">
                         <div id="bt-dropin"></div>

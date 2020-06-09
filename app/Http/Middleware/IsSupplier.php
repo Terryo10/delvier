@@ -3,6 +3,8 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use Illuminate\Http\Response;
+
 
 class IsSupplier
 {
@@ -15,6 +17,10 @@ class IsSupplier
      */
     public function handle($request, Closure $next)
     {
+        if ($request->user() && $request->user()->role != "1") {
+            return new response(view("notallowed")->with('status', '404'));
+        }
+
         return $next($request);
     }
 }

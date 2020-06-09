@@ -19,6 +19,10 @@ class CreateOrderItemsTable extends Migration
             $table->unsignedBigInteger('shop_id');
             $table->integer('quantity');
             $table->double('price');
+            $table->integer('commision');
+            $table->string('status');
+            $table->string('payout');
+            $table->integer('payoutId');
             $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
             $table->foreign('shop_id')->references('id')->on('shops')->onDelete('cascade');
             $table->unsignedBigInteger('order_id');

@@ -1,4 +1,4 @@
-@extends('layouts.front2')
+@extends('layouts.final')
 @section('content')
 	<section>
 		<div class="block">

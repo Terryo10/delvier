@@ -22,17 +22,14 @@
                                     <figure >
 										
 										<a href="/product/{{$item->id}}">
-                                            <img style="width:120px; height:100px;" src="storage/product_images/{{$item->firstImage}}">
+                                            <img style="" src="storage/product_images/{{$item->firstImage}}">
                                         </a>
 										
                                         
                                     </figure>
                                     <div class="product-details">
                                         <div class="ratings-container">
-                                            <div class="product-ratings">
-                                                <span class="ratings" style="width:100%"></span><!-- End .ratings -->
-                                                <span class="tooltiptext tooltip-top"></span>
-                                            </div><!-- End .product-ratings -->
+                                           
                                         </div><!-- End .product-container -->
                                         <h2 class="product-title">
 										<a href="/product/{{$item->id}}">{{$item->name}}</a>

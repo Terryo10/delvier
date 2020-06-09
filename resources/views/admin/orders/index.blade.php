@@ -1,81 +1,76 @@
 @extends('layouts.adminlay')
 @section('content')
- <!-- main-heading -->
-            <h2 class="main-title-w3layouts mb-2 text-center">Orders</h2>
-            <!--// main-heading -->
-                <ul class="prof-widgt-content">
-                            <li class="menu">
-                                <ul>
-                                    <li class="button">
-                                        <a href="#">
-                                            <i class="fas fa-envelope"></i> ORDER ACTIONS
-                                        </a>
-                                    </li>
-                                    <li class="dropdown">
-                                        <ul class="icon-navigation">
-                                            <li>
-                                                <a href="/category/create">View Delivered
-                                                    <span class="float-right"></span>
-                                                </a>
-                                            </li>
-                                            
-                                        </ul>
-                                    </li>
-                                </ul>
-                            </li>
-                        </ul>
-                            <!-- table3 -->
+<!-- table1 -->
                 <div class="outer-w3-agile mt-3">
-                    <h4 class="tittle-w3-agileits mb-4">all Orders</h4>
-                    <table class="table table-striped">
+                    <h4 class="tittle-w3-agileits mb-4">Ordered Item Table</h4>
+                    <div class="form-group">
+                    <input class="form-control" type="text" id="myInput" onkeyup="myFunction()" placeholder="Search By Order items..">
+                    </div>
+                    <table class="table" id="myTable">
                         <thead>
                             <tr>
-                                <th scope="col">Order REF</th>
+                                <th scope="col">Ordered Item</th>
+                                <th scope="col">Price</th>
+                                <th scope="col">QTY Orderd</th>
+                                <th scope="col">Paid</th>
+                                 <th scope="col">Status</th>
+                                
+                                <th scope="col">View Order</th>
+                                <th scope="col">Reduction %</th>
+                                <th scope="col">Income</th>
+                                <th scope="col">Action</th>
+                                <th scope="col">Payout Status</th>
                                
-                                 <th scope="col">Action</th>
-                                 <th scope="col">Action</th>
-                                 <th scope="col">Action</th>
-                                 
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($orders as $items)
+                            @foreach ($orderItems as $item)
                             <tr>
-                            <th scope="row">{{$items->name}}</th>
-                            <td><button  class="btn btn-primary" >Approve</button></td>
-                            <td><button  class="btn btn-success" >View </button></td>
-                            <td>
-                            <form class="delete_form" method="POST" action="{{action('CartegoryController@destroy',$items->id)}}">
-                                    @csrf
-                                    <input type="hidden" name="_method" value="DELETE">
-                                    <button type="submit" class="btn btn-danger" >Block </button>
-                                </form>
-                            </td>
-
                                 
+                                <td>{{$item->product->name}}</td>
+                                <td>${{$item->product->price}}</td>
+                                <td>X {{$item->quantity}}</td>
+                                <td>${{$item->quantity*$item->product->price}}</td>
+                                <td>{{$item->status}}</td>
+                               
+                                <td><a href="/parent/{{$item->order_id}}"><button class="btn btn-success">View Parent Order</button></a></td>
+                                <td>{{$item->commision}} %</td>
+                            <td>$ {{$item->quantity*$item->product->price-($item->quantity*$item->product->price*($item->commision/100))}}</td>
+                            <td><a href="/manage_payout/{{$item->id}}"><button class="btn btn-success">Manage payout</button></a></td>
+                            <td>{{$item->payout}}</td>
                             </tr>
                             @endforeach
+                            
                         </tbody>
+
+                       
+
+                       
                     </table>
                 </div>
-                <!--// table3 -->
+                <!--// table1 -->
+<script>
+    function myFunction() {
+    // Declare variables
+    var input, filter, table, tr, td, i, txtValue;
+    input = document.getElementById("myInput");
+    filter = input.value.toUpperCase();
+    table = document.getElementById("myTable");
+    tr = table.getElementsByTagName("tr");
 
-  
+    // Loop through all table rows, and hide those who don't match the search query
+    for (i = 0; i < tr.length; i++) {
+        td = tr[i].getElementsByTagName("td")[0];
+        if (td) {
+        txtValue = td.textContent || td.innerText;
+        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+            tr[i].style.display = "";
+        } else {
+            tr[i].style.display = "none";
+        }
+        }
+    }
+    }
+</script>
 
-                <script>
-                    $(document).ready(function(){
-
-                         $('.delete_form').on ('submit', function(){
-                    if(confirm("are you sure you want to delete it ?"))
-                    {
-                        return true;
-                    }
-                    else{
-                        return false;
-                    }
-                });
-
-                    });
-               
-                </script>
-                  @endsection
+@endsection

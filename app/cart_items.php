@@ -13,4 +13,12 @@ class cart_items extends Model
     {
         return $this->belongsTo(product::class);
     }
+
+    public function checkoutComponent(){
+        return $this->hasMany('App\checkoutComponent');
+    }
+
+    public function pendingorders(){
+        return $this->hasOne('App\pendingorders');
+    }
 }

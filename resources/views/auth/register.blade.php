@@ -68,7 +68,14 @@
                                 </button>
                             </div>
                         </div>
+                        <br>
+                       
                     </form>
+                         <div class="form-group row mb-0">
+                            <div class="col-md-6 offset-md-4">
+                                <a href="/privacy"><button class="btn btn-primary">Read Our Privacy Policy</button></a>
+                            </div>
+                        </div>  
                 </div>
             </div>
         </div>

@@ -46,6 +46,8 @@ class ShopController extends Controller
      */
     public function store(Request $request)
     {
+
+       
         $this->validate($request, [
 
             'image' => 'image|nullable|max:1999',
@@ -73,7 +75,13 @@ class ShopController extends Controller
         $shop = new shop();
         $shop->name = $request->input('name');
         $shop->logo = $fileNameToStore;
-        $shop->Address = $request->input('address');
+        $shop->street1 = $request->input('street1');
+        $shop->street2 = $request->input('street2');
+        $shop->city = $request->input('city');
+        $shop->state = $request->input('state');
+        $shop->country = $request->input('country');
+        $shop->company = $request->input('company');
+        $shop->zip = $request->input('zip');
         $shop->phone = $request->input('phone');
         $shop->whatsappPhone = $request->input('whatsappPhone');
         $shop->description = $request->input('description');

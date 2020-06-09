@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\order;
 use Auth;
+use App\delivery;
 use Illuminate\Http\Request;
 
 class OrderController extends Controller
@@ -14,9 +15,9 @@ class OrderController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index()
-    { 
+    {
         $orders = auth::user()->orders()->orderBy('created_at', 'desc')->get();
-        
+
         if ($orders->count() > 0) {
             return response()->json([
                 'success' => true,
@@ -60,9 +61,16 @@ class OrderController extends Controller
      * @param  \App\order  $order
      * @return \Illuminate\Http\Response
      */
-    public function show(order $order)
+    public function show($id)
     {
-        //
+        $order = order::find($id);
+        $delId = $order->delivery_id;
+        $delivery= delivery::find($delId);
+    
+
+        return view('singleorder')
+        ->with('order',$order)
+        ->with('delivery',$delivery);
     }
 
     /**

@@ -19,6 +19,12 @@ class CreateOrdersTable extends Migration
             $table->string('transaction_ref');
             // $table->double('checkedOutPrice');
             $table->unsignedBigInteger('delivery_id');
+            $table->string('status');
+            $table->integer('commision');
+            $table->string('tracker_id');
+            $table->string('shipment_id')  ;
+            $table->string('trackerUrl') ;
+            $table->string('carrier') ;
             $table->timestamps();
         });
     }

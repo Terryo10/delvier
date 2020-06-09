@@ -6,6 +6,8 @@ use App\order;
 use App\product;
 use App\shop;
 use App\User;
+use App\order_items;
+use Illuminate\Http\Request;
 
 class AdminController extends Controller
 {
@@ -32,6 +34,19 @@ class AdminController extends Controller
             ->with('singleuser', $singleuser);
     }
 
+    public function usersupdate(Request $request, $id)
+    {
+        // return $request;
+        // $id = $request->id;
+        $user = User::findOrFail($id);
+        $user->update([
+            'role' => $request->input('role'),
+        ]);
+
+        return 123;
+
+    }
+
     //Shops Management
     public function shops()
     {
@@ -49,17 +64,22 @@ class AdminController extends Controller
 
     public function oders()
     {
+        $orderItems = order_items::all();
         $orders = order::all();
         return view('admin.orders.index')
-            ->with('orders', $orders);
+            ->with('orderItems',$orderItems);
     }
     public function income()
     {
 
     }
 
-    public function payouts()
+    public function payout($id)
     {
+        $orderItem = order_items::find($id);
+        return view('admin.orders.edit')
+        ->with('orderItem',$orderItem);
+
 
     }
 

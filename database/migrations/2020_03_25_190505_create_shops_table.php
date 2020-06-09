@@ -17,7 +17,13 @@ class CreateShopsTable extends Migration
             $table->id();
             $table->string('name');
             $table->string('logo');
-            $table->string('Address');
+            $table->string('street1');
+            $table->string('street2')->nullable();
+            $table->string('city');
+            $table->string('state');
+            $table->string('country');
+            $table->string('company');
+            $table->string('zip');
             $table->bigInteger('phone')->unique();
             $table->bigInteger('whatsappPhone')->unique();
             $table->text('description');

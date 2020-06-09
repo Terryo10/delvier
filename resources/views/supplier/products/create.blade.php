@@ -13,18 +13,13 @@
                                     <input name="name" type="text" class="form-control" id="exampleFormControlInput1" placeholder="" required=""> 
                                 </div>
                                 <div class="form-group">
-                                    <label for="exampleFormControlSelect1">Shop / Store select</label>
-                                    <select name="shop_id"class="form-control" id="exampleFormControlSelect1">
-                                        <option>--SELECT STORE--</option>
-                                       @foreach ($shops as $item)
-                                    <option value="{{$item->id}}">{{$item->name}}</option> 
-                                       @endforeach
+                                     <input name="shop_id" type="hidden" value="{{$shops->id}}" class="form-control" id="exampleFormControlInput1" placeholder="" required=""> 
+                                   
                                     
-                                    </select>
                                 </div>
                                 <div class="form-group">
                                     <label for="exampleFormControlSelect2"> Category select</label>
-                                    <select name="category_id" multiple class="form-control" id="exampleFormControlSelect2">
+                                    <select name="category_id" multiple class="form-control" id="exampleFormControlSelect2" required="">
                                        @foreach ($category as $category)
                                     <option value="{{$category->id}}">{{$category->name}}</option>
                                        @endforeach
@@ -34,6 +29,10 @@
                                   <div class="form-group">
                                     <label for="exampleFormControlInput1">Price</label>
                                     <input type="number" name="price" class="form-control" id="exampleFormControlInput1" placeholder="" required=""> 
+                                </div>
+                                <div class="form-group">
+                                    <label for="exampleFormControlInput1">Minimum Order Quantity (MOQ)</label>
+                                    <input type="number" name="minOrder" class="form-control" id="exampleFormControlInput1" placeholder="" required=""> 
                                 </div>
                                 <div class="form-group">
                                     <label for="exampleFormControlInput1">Quantity</label>
@@ -46,6 +45,22 @@
                                    
                                   <input type="file" name="firstImage" id="fileToUpload">
                                   
+                                </div>
+                                <div class="form-group"> 
+                                    <label for="exampleFormControlInput1">Weight Note: Weights are in OUNCES (OZ)</label>
+                                    <input type="number" name="weight" class="form-control" id="exampleFormControlInput1" placeholder="0.0" required="" step=any> 
+                                </div>
+                                <div class="form-group">
+                                    <label for="exampleFormControlInput1">Length</label>
+                                    <input type="number" name="length" class="form-control" id="exampleFormControlInput1" placeholder="0.0" required="" step=any> 
+                                </div>
+                                <div class="form-group">
+                                    <label for="exampleFormControlInput1">width</label>
+                                    <input type="number" name="width" class="form-control" id="exampleFormControlInput1" placeholder="0.0" required="" step=any> 
+                                </div>
+                                <div class="form-group">
+                                    <label for="exampleFormControlInput1">height</label>
+                                    <input type="number" name="height" class="form-control" id="exampleFormControlInput1" placeholder="0.0" required="" step=any> 
                                 </div>
                                 <div class="form-group">
                                     <label for="exampleFormControlTextarea1">Description</label>

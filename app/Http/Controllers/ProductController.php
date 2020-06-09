@@ -4,12 +4,21 @@ namespace App\Http\Controllers;
 
 use App\cartegory;
 use App\product;
-use Auth;
-use Illuminate\Http\Request;
 use App\shop;
+use Auth;
+use App\parcel;
+use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
+
+    public function __construct()
+    {
+        // Middleware only applied to these methods
+        $this->middleware('IsSupplier', ['only' => [
+            'create', 'store', // Could add bunch of more methods too
+        ]]);
+    }
     /**
      * Display a listing of the resource.
      *
@@ -19,6 +28,7 @@ class ProductController extends Controller
     {
         //
     }
+
 
     /**
      * Show the form for creating a new resource.
@@ -88,14 +98,13 @@ class ProductController extends Controller
                 $image->storeAs('public/product_images', $fileNameToStore);
                 $data[] = $fileNameToStore;
             }
-            
-          
+
         }
 
         $getshop = shop::find($request->shop_id);
         //select * from shop where id = id
-        
-        $phone= $getshop->phone;
+
+        $phone = $getshop->phone;
         $getWhatsapp = $getshop->whatsappPhone;
         // $getWhatsapp = $getshop->
 
@@ -109,11 +118,20 @@ class ProductController extends Controller
         $product->quantity = $request->input('qty');
         $product->description = $request->input('description');
         $product->user_id = $user;
+        $product->minOrder = $request->input('minOrder');
         $product->cartegory_id = $request->input('category_id');
         $product->shop_id = $request->input('shop_id');
         $product->whatsappPhone = $getWhatsapp;
         $product->phone = $phone;
         $product->save();
+
+        $parcel = new parcel;
+        $parcel->length = $request->input('length');
+        $parcel->width = $request->input('width');
+        $parcel->height = $request->input('height');
+        $parcel->weight = $request->input('weight');
+        $parcel->product_id = $product->id;
+        $parcel->save();
         return redirect('/supplier/shops')->with('success', 'Product Created Successfully');
 
         // return redirect('/shops/'+$pra)->with('success', 'Product Created Successfully');
@@ -128,8 +146,10 @@ class ProductController extends Controller
      */
     public function show(product $product)
     {
+        $featured = product::where('shop_id','=',$product->shop_id);
         return view('product')
-            ->with('product', $product);
+            ->with('product', $product)
+            ->with('featured',$featured);
     }
 
     /**
@@ -140,7 +160,8 @@ class ProductController extends Controller
      */
     public function edit(product $product)
     {
-        //
+
+        return view('supplier.products.edit')->with('product', $product);
     }
 
     /**
@@ -150,9 +171,19 @@ class ProductController extends Controller
      * @param  \App\product  $product
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, product $product)
+    public function update(Request $request,$id)
     {
-        //
+        $this->validate($request, [
+            'quantity' => 'required|numeric',
+           
+        ]);
+
+        $product = product::findOrFail($id);
+        $product->update([
+            'quantity' => $request->input('quantity'),
+        ]);
+        return redirect()->back();
+
     }
 
     /**
@@ -163,7 +194,7 @@ class ProductController extends Controller
      */
     public function destroy(product $product)
     {
-        //
+
     }
 
     public function search(Request $request)

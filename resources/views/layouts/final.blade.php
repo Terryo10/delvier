@@ -10,9 +10,10 @@
     <meta name="keywords" content="" />
     <meta name="description" content="">
     <meta name="author" content="">
-        
+
     <!-- Favicon -->
 <link rel="icon" type="image/x-icon" href="{{asset('demo/assets/images/icons/favicon.ico')}}">
+    <script src="https://use.fontawesome.com/1fa6a4db8c.js"></script>
     <!--Start of Tawk.to Script-->
 <script type="text/javascript">
 var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
@@ -79,11 +80,12 @@ s0.parentNode.insertBefore(s1,s0);
                                 <ul>
                                     @guest
                                         @else
-                                          <li><a href="/home">MY ACCOUNT </a></li>
+                                        <li><a href="/home">MY ACCOUNT </a></li>
+                                        <li><a href="/pendingorders ">Pending Orders </a></li>
                                     @endguest
-                                  
-                                   
-                                    <li><a href="/contact">Contact</a></li>
+
+
+
                                     @guest
                                     <li><a href="/login" >LOG IN</a></li>
                                     <li><a href="/register" >REGISTER</a></li>
@@ -121,7 +123,7 @@ s0.parentNode.insertBefore(s1,s0);
                             <form action="{{route('search')}}" method="GET">
                                 <div class="header-search-wrapper">
                                     <input type="search" class="form-control"name="query" value="{{ request()->input('query')}}" placeholder="Search..." required>
-                                    
+
                                     <button class="btn" type="submit"><i class="icon-magnifier"></i></button>
                                 </div><!-- End .header-search-wrapper -->
                             </form>
@@ -160,7 +162,7 @@ s0.parentNode.insertBefore(s1,s0);
                                             </div><!-- End .product-details -->
 
                                             <figure class="product-image-container">
-                                                <a href="product.html" class="product-image">
+                                                <a href="/product/{{$items->product['id']}}" class="product-image">
                                                     <img src="/storage/product_images/{{$items->product['firstImage']}}" alt="product">
                                                 </a>
                                                 {{-- <a href="#" class="btn-remove" title="Remove Product"><i class="icon-cancel"></i></a> --}}
@@ -174,10 +176,10 @@ s0.parentNode.insertBefore(s1,s0);
                                          @empty
 
                                          @endforelse
-                                         @endisset 
-                                        
+                                         @endisset
 
-                                        
+
+
                                     </div><!-- End .cart-product -->
 
                                     <div class="dropdown-cart-total">
@@ -187,8 +189,14 @@ s0.parentNode.insertBefore(s1,s0);
                                     </div><!-- End .dropdown-cart-total -->
 
                                     <div class="dropdown-cart-action">
-                                        <a href="/cart" class="btn">View Cart</a>
-                                        <a href="/brain" class="btn">Checkout</a>
+                                        @guest
+                                        <a href="/login" class="btn">Login to continue</a>
+                                            @else
+
+                                            <a href="/cart" class="btn">View Cart</a>
+
+                                        @endguest
+
                                     </div><!-- End .dropdown-cart-total -->
                                 </div><!-- End .dropdownmenu-wrapper -->
                             </div><!-- End .dropdown-menu -->
@@ -215,10 +223,10 @@ s0.parentNode.insertBefore(s1,s0);
                                                         @foreach ($categoryese as $item)
                                                     <li><a href="/categories/{{$item->id}}">{{$item->name}}</a></li>
                                                         @endforeach
-                                                                                                 
+
                                                     </ul>
                                                 </div><!-- End .col-lg-6 -->
-                                               
+
                                             </div><!-- End .row -->
                                         </div><!-- End .col-lg-8 -->
                                         <div class="col-lg-4">
@@ -231,18 +239,26 @@ s0.parentNode.insertBefore(s1,s0);
                                     </div>
                                 </div><!-- End .megamenu -->
                             </li>
-                            <li><a href="/shop">Shop</a></li>
+                            <li><a href="/shopping">Shop</a></li>
                             <li><a href="/home">My Account</a></li>
-                    
+                            @guest
+
+                                @else
+                                <li><a href="/pendingorders ">Pending Orders </a></li>
+                                @endguest
+
+
                             <li><a href="/about">About Us</a></li>
-                             
+
                         </ul>
                     </nav>
                 </div><!-- End .header-bottom -->
             </div><!-- End .header-bottom -->
         </header><!-- End .header -->
-        
+
         <main class="main">
+
+            @include('inc.message')
             @yield('content')
         </main><!-- End .main -->
 
@@ -259,11 +275,11 @@ s0.parentNode.insertBefore(s1,s0);
                                     </div><!-- End .col-lg-6 -->
 
                                     <div class="col-lg-6">
-                                        <form action="#">
+                                        {{-- <form action="#">
                                             <input type="email" class="form-control" placeholder="Email address" required>
 
                                             <input type="submit" class="btn" value="Subscribe">
-                                        </form>
+                                        </form> --}}
                                     </div><!-- End .col-lg-6 -->
                                 </div><!-- End .row -->
                             </div><!-- End .widget -->
@@ -271,9 +287,13 @@ s0.parentNode.insertBefore(s1,s0);
 
                         <div class="col-md-3 widget-social">
                             <div class="social-icons">
-                                <a href="#" class="social-icon" target="_blank"><i class="icon-facebook"></i></a>
-                                <a href="#" class="social-icon" target="_blank"><i class="icon-twitter"></i></a>
-                                <a href="#" class="social-icon" target="_blank"><i class="icon-linkedin"></i></a>
+                                <a href="https://www.facebook.com/delvierinternational" class="social-icon" target="_blank"><i class="icon-facebook"></i></a>
+                                <a href="https://twitter.com/Delvier1" class="social-icon" target="_blank"><i class="icon-twitter"></i></a>
+                                <a href="https://www.instagram.com/delvier_/" class="social-icon" target="_blank"><i class="icon-instagram"></i></a>
+                                <a href="https://www.instagram.com/delvier_/" class="social-icon" target="_blank"><i class="icon-"></i></a>
+                                 <a href="https://www.instagram.com/delvier_/" class="social-icon" target="_blank"><i class="icon-linkedin"></i></a>
+
+
                             </div><!-- End .social-icons -->
                         </div><!-- End .col-md-3 -->
                     </div><!-- End .row -->
@@ -288,13 +308,13 @@ s0.parentNode.insertBefore(s1,s0);
                                 <h4 class="widget-title">Contact Us</h4>
                                 <ul class="contact-info">
                                     <li>
-                                        <span class="contact-info-label">Address:</span>102 Prince Edward Road Harare Zimbabwe
+                                        <span class="contact-info-label">Address:</span>216 Landros Mare Street Polokwane South Africa
                                     </li>
                                     <li>
                                         <span class="contact-info-label">Phone:</span>Toll Free <a href="tel:">+(263)786 294 425</a>
                                     </li>
                                     <li>
-                                        <span class="contact-info-label">Email:</span> <a href="mailto:sales@delvier.com">sales@delvier.com</a>
+                                        <span class="contact-info-label">Email:</span> <a href="mailto:info@delvier.com">info@delvier.com</a>
                                     </li>
                                 </ul>
                             </div><!-- End .widget -->
@@ -310,14 +330,14 @@ s0.parentNode.insertBefore(s1,s0);
                                             <div class="col-sm-6 col-md-5">
                                                 <ul class="links">
                                                     <li><a href="/about">About Us</a></li>
-                                                    <li><a href="/contact">Contact Us</a></li>
+                                                    <li><a href="/shopping">Shop</a></li>
                                                     <li><a href="/home">My Account</a></li>
                                                 </ul>
                                             </div><!-- End .col-sm-6 -->
                                             <div class="col-sm-6 col-md-5">
                                                 <ul class="links">
                                                     <li><a href="/home">Orders History</a></li>
-                                                    
+
                                                     <li><a href="/login">Login</a></li>
                                                 </ul>
                                             </div><!-- End .col-sm-6 -->
@@ -328,20 +348,22 @@ s0.parentNode.insertBefore(s1,s0);
                                 <div class="col-md-7">
                                     <div class="widget">
                                         <h4 class="widget-title">Main Services</h4>
-                                        
+
                                         <div class="row">
                                             <div class="col-sm-6">
                                                 <ul class="links">
+                                                    <li><a href="/privacy">Privacy Policy</a></li>
                                                     <li><a href="#">Online Shopping</a></li>
                                                     <li><a href="#">Delivery</a></li>
-                                              
+
+
                                                 </ul>
                                             </div><!-- End .col-sm-6 -->
                                             <div class="col-sm-6">
                                                  <ul class="links">
                                                     <li><a href="https://www.facebook.com/designavezw/">Powered By DESIGNAVE</a></li>
-                                                    
-                                              
+
+
                                                 </ul>
                                                 <!--End .col-sm-6 -->
                                         </div><!-- End .row -->
@@ -355,7 +377,7 @@ s0.parentNode.insertBefore(s1,s0);
                                 <ul class="contact-info">
                                     <li>
                                         <span class="contact-info-label">Working Days/Hours:</span>
-                                        Mon - Sun / 9:00AM - 8:00PM
+                                        Mon - Sun 24/7
                                     </li>
                                 </ul>
                                 <img src="/demo/assets/images/payments.png" alt="payment methods" class="footer-payments">
@@ -374,27 +396,28 @@ s0.parentNode.insertBefore(s1,s0);
             <span class="mobile-menu-close"><i class="icon-cancel"></i></span>
             <nav class="mobile-nav">
                 <ul class="mobile-menu">
-                    <li class="active"><a href="index.html">Home</a></li>
+                    <li class="active"><a href="/">Home</a></li>
                     <li>
                         <a href="#">Categories</a>
                         <ul>
                             <li><a href="/categories">GO TO CATEGORIES PAGE</a></li>
                             @foreach ($categoryese as $item)
-                        <li><a href="/categories/{{$item->id}}">{{$item->name}}</a></li>    
+                        <li><a href="/categories/{{$item->id}}">{{$item->name}}</a></li>
                             @endforeach
                         </ul>
                     </li>
-                  
-               
-                      
+
+                    <li><a href="/home">My Account</a></li>
+                    <li><a href="/shopping">Shop</a></li>
                     <li><a href="/about">About</a></li>
-                    <li><a href="/contact">Contact Us</a></li>
+
 
                     @guest
-                       <li><a href="/login" >Login</a></li>  
-                       <li><a href="/register" >Register</a></li>  
+                       <li><a href="/login" >Login</a></li>
+                       <li><a href="/register" >Register</a></li>
 
                        @else
+                        <li><a href="/pendingorders ">Pending Orders </a></li>
                            <li>
                                     <a class="dropdown-item" href="{{ route('logout') }}"
                                        onclick="event.preventDefault();
@@ -407,19 +430,20 @@ s0.parentNode.insertBefore(s1,s0);
                                     </form>
                             </li>
                     @endguest
-                   
+
                 </ul>
             </nav><!-- End .mobile-nav -->
 
             <div class="social-icons">
-                <a href="#" class="social-icon" target="_blank"><i class="icon-facebook"></i></a>
-                <a href="#" class="social-icon" target="_blank"><i class="icon-twitter"></i></a>
-                <a href="#" class="social-icon" target="_blank"><i class="icon-instagram"></i></a>
+                <a href="https://www.facebook.com/delvierinternational" class="social-icon" target="_blank"><i class="icon-facebook"></i></a>
+                <a href="https://twitter.com/Delvier1" class="social-icon" target="_blank"><i class="icon-twitter"></i></a>
+                <a href="https://www.instagram.com/delvier_/" class="social-icon" target="_blank"><i class="icon-instagram"></i></a>
+
             </div><!-- End .social-icons -->
         </div><!-- End .mobile-menu-wrapper -->
     </div><!-- End .mobile-menu-container -->
 
-  
+
 
     <!-- Add Cart Modal -->
     <div class="modal fade" id="addCartModal" tabindex="-1" role="dialog" aria-labelledby="addCartModal" aria-hidden="true">
@@ -464,7 +488,7 @@ function increment(id) {
   // window.alert(jk)
   jj.value = jk;
 
-  
+
 }
 
 function decrement(id) {
@@ -479,9 +503,9 @@ function decrement(id) {
       jj.value = 1;
   }
 
- 
 
-  
+
+
 }
 
 // $(document).ready(function(){
@@ -489,19 +513,19 @@ function decrement(id) {
 //     var quantitiy=0;
 
 //    $('.quantity-right-plus').click(function(e){
-        
+
 //         // Stop acting like a button
 //         e.preventDefault();
 //         // Get the field name
 //         var quantity = parseInt($('#quantity').val());
-        
+
 //         // If is not undefined
-            
+
 //             $('#quantity').val(quantity + 1);
 
-          
+
 //             // Increment
-        
+
 //     });
 
 //      $('.quantity-left-minus').click(function(e){
@@ -509,20 +533,19 @@ function decrement(id) {
 //         e.preventDefault();
 //         // Get the field name
 //         var quantity = parseInt($('#quantity').val());
-        
+
 //         // If is not undefined
-      
+
 //             // Increment
 //             if(quantity>0){
 //             $('#quantity').val(quantity - 1);
 //             }
 //     });
-    
+
 // });
 
 </script>
-
+@include('cookieConsent::index')
 </body>
 
-<!-- Mirrored from portotheme.com/html/porto_ecommerce/demo_5/index.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 24 Apr 2020 03:56:52 GMT -->
 </html>

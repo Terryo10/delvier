@@ -2,17 +2,18 @@
 
 namespace App;
 
+use App\delivery;
 use App\product as items;
 use App\shop as shops;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
-use App\delivery;
+use App\Notifications\PasswordResetNotification;
 
 
 class User extends Authenticatable
 {
-    use  HasApiTokens, Notifiable;
+    use HasApiTokens, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -20,7 +21,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'name', 'email', 'password', 'role',
     ];
 
     /**
@@ -41,7 +42,7 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    protected $with = ['products', 'shops','cart','orders','delivery'];
+    protected $with = ['products', 'shops', 'cart', 'orders', 'delivery', 'temporaryAddress','checkoutComponent','pendingOrders'];
 
     public function products()
     {
@@ -54,13 +55,35 @@ class User extends Authenticatable
 
     public function shops()
     {
-        return $this->hasMany(shops::class);
+        return $this->hasOne(shops::class);
     }
 
-     public function orders(){
-            return $this->hasMany('App\order');
+    public function orders()
+    {
+        return $this->hasMany('App\order');
     }
-    public function delivery(){
+    public function delivery()
+    {
         return $this->hasMany('App\delivery');
     }
+
+    public function temporaryAddress()
+    {
+        return $this->hasOne('App\temporaryAddress');
+
+    }
+
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new PasswordResetNotification($token));
+    }
+
+    public function checkoutComponent(){
+        return $this->hasOne('App\checkoutComponent');
+    }
+
+    public function pendingOrders(){
+        return $this->hasMany('App\pendingorders');
+    }
+
 }

@@ -28,6 +28,8 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
 
     <!-- Style-sheets -->
     <!-- Bootstrap Css -->
+    <link rel="stylesheet" href="{{asset('build/css/intlTelInput.css')}}">
+    <link rel="stylesheet" href="{{asset('build/css/demo.css')}}">
     <link href="{{ asset('admino/css/bootstrap.css')}}" rel="stylesheet" type="text/css" media="all" />
     <!-- Bootstrap Css -->
     <!-- Bars Css -->
@@ -77,38 +79,23 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
                         <i class="fas fa-laptop"></i>
                        shops
                     </a>
-                   
-                </li>
-                 <li>
-                    <a href="supplier/orders">
-                        <i class="far fa-envelope"></i>
-                        Orders
-                        
-                    </a>
+
                 </li>
                 <li>
-                    <a href="#">
+                    <a href="/supplier/pendingorders">
                         <i class="far fa-envelope"></i>
-                        products
-                        
+                        Pending orders
+
                     </a>
                 </li>
-                  <li>
-                    <a href="/supplier/settings">
-                        <i class="far fa-question-circle"></i>
-                        Settings
-                       
-                    </a>
-                </li>
-                
-            
                  <li>
-                    <a href="/supplier/messages">
+                    <a href="/supplier/orders">
                         <i class="far fa-envelope"></i>
-                        Messages
-                       
+                        Orders
+
                     </a>
                 </li>
+
                 <li>
                     <a href="#pageSubmenu3" data-toggle="collapse" aria-expanded="false">
                         <i class="fas fa-users"></i>
@@ -117,8 +104,8 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
                     </a>
                     <ul class="collapse list-unstyled" id="pageSubmenu3">
                         <li>
-                            
-                        
+
+
                                     <a class="dropdown-item" href="{{ route('logout') }}"
                                        onclick="event.preventDefault();
                                                      document.getElementById('logout-form').submit();">
@@ -128,10 +115,10 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
                                     <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                                         @csrf
                                     </form>
-                                
+
                         </li>
                     </ul>
-                    
+
                 </li>
             </ul>
         </nav>
@@ -148,26 +135,26 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
                         </button>
                     </div>
                     <!-- Search-from -->
-                    
+
                     <!--// Search-from -->
-                    
+
                 </div>
             </nav>
             <!--// top-bar -->
             <div class="container-fluid">
-             
+
                     <!-- Stats -->
                     @include('inc.message')
                      @yield('content')
                     <!--// Browser stats -->
-            
+
             </div>
             <!--// Three-grids -->
             <!-- Countdown -->
-            
+
             <!--// Countdown -->
             <!-- Copyright -->
-            
+
             <!--// Copyright -->
         </div>
     </div>
@@ -176,7 +163,7 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
     <!-- Required common Js -->
     <script src='{{ asset('admino/js/jquery-2.2.3.min.js')}}'></script>
     <!-- //Required common Js -->
-    
+
     <!-- loading-gif Js -->
     <script src="{{ asset('admino/js/modernizr.js')}}"></script>
     <script>
@@ -438,6 +425,34 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
     <!-- Js for bootstrap working-->
     <script src="{{ asset('admino/js/bootstrap.min.js')}}"></script>
     <!-- //Js for bootstrap working -->
+
+    <script src="{{asset('build/js/intlTelInput.js')}}"></script>
+  <script>
+    var input = document.querySelector("#phone");
+    window.intlTelInput(input, {
+      // allowDropdown: false,
+      // autoHideDialCode: false,
+       autoPlaceholder: "on",
+      // dropdownContainer: document.body,
+      // excludeCountries: ["us"],
+      // formatOnDisplay: false,
+      geoIpLookup: function(callback) {
+        $.get("http://ipinfo.io", function() {}, "jsonp").always(function(resp) {
+          var countryCode = (resp && resp.country) ? resp.country : "";
+          callback(countryCode);
+        });
+      },
+      // hiddenInput: "full_number",
+      // initialCountry: "auto",
+      // localizedCountries: { 'de': 'Deutschland' },
+      // nationalMode: false,
+      // onlyCountries: ['us', 'gb', 'ch', 'ca', 'do'],
+      // placeholderNumberType: "MOBILE",
+      // preferredCountries: ['cn', 'jp'],
+      // separateDialCode: true,
+      utilsScript: "/build/js/utils.js",
+    });
+  </script>
 
 </body>
 

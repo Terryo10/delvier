@@ -79,6 +79,13 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
                     </a>
                    
                 </li>
+                 <li>
+                    <a href="/slider" >
+                        <i class="fas fa-laptop"></i>
+                       Slider Manager
+                    </a>
+                   
+                </li>
                 <li>
                     <a href="/shop-manager" >
                         <i class="fas fa-laptop"></i>
@@ -107,30 +114,10 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
                         
                     </a>
                 </li>
-                  <li>
-                    <a href="/income-manager">
-                        <i class="far fa-envelope"></i>
-                     Income Manager   
-                    </a>
-                </li>
-                  <li>
-                    <a href="/admin/payouts">
-                        <i class="far fa-envelope"></i>
-                        Payout Requests
-                    </a>
-                </li>
-                  <li>
-                    <a href="/admin/delivery">
-                        <i class="far fa-envelope"></i>
-                        Delivery
-                    </a>
-                </li>
-                
-            
                  <li>
-                    <a href="/messages">
+                    <a href="/commision">
                         <i class="far fa-envelope"></i>
-                        Messages
+                        Commision Manager
                        
                     </a>
                 </li>

@@ -6,6 +6,8 @@ use App\cart;
 use App\cartegory;
 use Auth;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Schema;
+
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -26,6 +28,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        Schema::defaultStringLength(191);
+
 
         view()->composer('*', function ($view) {
             $user = auth::user();
@@ -90,7 +94,7 @@ class AppServiceProvider extends ServiceProvider
                     return $total = 0;
                 } else {
                     $total = 0;
-                    foreach ($cart_items as $item) {
+                    foreach ($cart_items as $item){
                         $total = $total + ($item->quantity * $item->price);
                     }
                     return $total;

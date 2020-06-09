@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\cartegory;
+use App\product;
 use Illuminate\Http\Request;
 
 class CartegoryController extends Controller
@@ -19,12 +20,32 @@ class CartegoryController extends Controller
             ->with('category', $category);
     }
 
-    public function ApiCategory()
+    public function ApiCategory(Request $request)
     {
-        $category = cartegory::all();
+        if ($request->id == null) {
+            $category = cartegory::all();
+            return response()->json([
+                'success' => true,
+                'category' => $category,
+            ]);
+
+        }
+        $id = $request->id;
+        $products = product::where('cartegory_id', '=', $id)->get();
         return response()->json([
             'success' => true,
-            'category' => $category,
+            'products' => $products,
+        ]);
+
+    }
+
+    public function ApiCategoryFetch(Request $request)
+    {
+        $id = $request->id;
+        $products = product::where('cartegory_id', '=', $id)->get();
+        return response()->json([
+            'success' => true,
+            'products' => $products,
         ]);
 
     }
